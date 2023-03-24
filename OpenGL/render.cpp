@@ -22,7 +22,6 @@ void Program::onStartup()
     testing->Size = (height > width ? height : width);
     testing->setPositions(350);
 
-
     lightning = new Square();
     lightning->Size = 300;
     lightning->A = 0;
