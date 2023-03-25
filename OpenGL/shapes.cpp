@@ -65,15 +65,15 @@ Parallelogram* copyShape(Parallelogram* ptr)
 }
 
 
-Square::Square() :Z_rotate(0) , Transform_from_middle(true), Y_rotate(0) , X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), Size(100), Texture(""), X(0), Y(0) {
+Square::Square() :Size(100) {
 
     Program::sub_objects.push_back(this);
     float sqr_ver_buf[] =
     {
-      1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.9f, 0.0f, 0.0f,
-      0.9f, 0.9f, 1.0f, 0.0f,
-      0.9f, 1.0f, 1.0f, 1.0f,
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
     };
 
 
@@ -100,35 +100,6 @@ Square::Square() :Z_rotate(0) , Transform_from_middle(true), Y_rotate(0) , X_rot
 }
 
 
-void Square::updateTexture()
-{
-    if (Texture == "")
-    {
-        setUniform1b("has_texture", false);
-    }
-    else
-    {
-        setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true);
-    }
-    prev_Texture = Texture;
-}
-
-
-void Square::updateColors()
-{
-    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
-}
-
-void Square::updateRotation()
-{
-    glm::mat4 mvp = 
-        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-      * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-      * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-      * proj;
-    setUniformMatrix4fv("mvp", mvp);
-}
 
 void Square::updateVertexBuffer()
 {
@@ -148,10 +119,10 @@ void Square::updateVertexBuffer()
 
     float sqr_ver_buf[] =
     {
-      X_2, Y_2, 0.0f, 1.0f,
-      X_2, Y_1, 0.0f, 0.0f,
-      X_1, Y_1 , 1.0f, 0.0f,
-      X_1, Y_2, 1.0f, 1.0f,
+      X_2, Y_2, 1.0f, 1.0f,
+      X_2, Y_1, 1.0f, 0.0f,
+      X_1, Y_1 ,0.0f, 0.0f,
+      X_1, Y_2, 0.0f, 1.0f,
     };
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
@@ -180,106 +151,20 @@ void Square::draw()
     Object::draw();
 }
 
-void Square::removeTexture()
-{
-    Texture = "";
-}
-
-void Square::setColors(int c_R, int c_G, int c_B) 
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-}
-
-void Square::setColors(int RGB)
-{
-    R = RGB;
-    G = RGB;
-    B = RGB;
-}
-
-void Square::setColors(int c_R, int c_G, int c_B, int c_A)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-    A = c_A;
-}
-
-void Square::setColorsTexture(int c_R, int c_G, int c_B)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-}
-
-void Square::setColorsTexture(int RGB)
-{
-    Texture_colors.R = RGB;
-    Texture_colors.G = RGB;
-    Texture_colors.B = RGB;
-}
-
-void Square::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-    Texture_colors.A = c_A;
-}
-
-void Square::setPositions(int XY)
-{
-    X = XY;
-    Y = XY;
-}
-
-void Square::setPositions(int _X, int _Y)
-{
-    X = _X;
-    Y = _Y;
-}
-
-void Square::setPositions(int _X, int _Y, int _Z)
-{
-    X = _X;
-    Y = _Y;
-    Z_index = _Z;
-}
-
-void Square::setRotation(int Z)
-{
-    Z_rotate = Z;
-}
-
-void Square::setRotations(int X, int Y, int Z)
-{
-    X_rotate = X;
-    Y_rotate = Y;
-    Z_rotate = Z;
-}
-
-
-void Square::updateTextureColors() {
-    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
-
-void Rectangle::updateTextureColors() {
-    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
 
 
 
-Rectangle::Rectangle() :Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), X_size(100) , Y_size(50), Texture(""), X(0), Y(0) {
+
+
+Rectangle::Rectangle() : X_size(100) , Y_size(50) {
 
     Program::sub_objects.push_back(this);
     float sqr_ver_buf[] =
     {
-      1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.9f, 0.0f, 0.0f,
-      0.9f, 0.9f, 1.0f, 0.0f,
-      0.9f, 1.0f, 1.0f, 1.0f,
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
     };
 
 
@@ -307,35 +192,6 @@ Rectangle::Rectangle() :Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X
 }
 
 
-void Rectangle::updateTexture()
-{
-    if (Texture == "")
-    {
-        setUniform1b("has_texture", false);
-    }
-    else
-    {
-        setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true);
-    }
-    prev_Texture = Texture;
-}
-
-
-void Rectangle::updateColors()
-{
-    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
-}
-
-void Rectangle::updateRotation()
-{
-    glm::mat4 mvp =
-        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-        * proj;
-    setUniformMatrix4fv("mvp", mvp);
-}
 
 void Rectangle::updateVertexBuffer()
 {
@@ -355,10 +211,10 @@ void Rectangle::updateVertexBuffer()
 
     float sqr_ver_buf[] =
     {
-      X_2, Y_2, 0.0f, 1.0f,
-      X_2, Y_1, 0.0f, 0.0f,
-      X_1, Y_1 , 1.0f, 0.0f,
-      X_1, Y_2, 1.0f, 1.0f,
+      X_2, Y_2, 1.0f, 1.0f,
+      X_2, Y_1, 1.0f, 0.0f,
+      X_1, Y_1 ,0.0f, 0.0f,
+      X_1, Y_2, 0.0f, 1.0f
     };
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
@@ -391,86 +247,6 @@ void Rectangle::draw()
     Object::draw();
 }
 
-void Rectangle::removeTexture()
-{
-    Texture = "";
-}
-
-void Rectangle::setColors(int c_R, int c_G, int c_B)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-}
-
-void Rectangle::setColors(int RGB)
-{
-    R = RGB;
-    G = RGB;
-    B = RGB;
-}
-
-void Rectangle::setColors(int c_R, int c_G, int c_B, int c_A)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-    A = c_A;
-}
-
-void Rectangle::setColorsTexture(int c_R, int c_G, int c_B)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-}
-
-void Rectangle::setColorsTexture(int RGB)
-{
-    Texture_colors.R = RGB;
-    Texture_colors.G = RGB;
-    Texture_colors.B = RGB;
-}
-
-void Rectangle::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-    Texture_colors.A = c_A;
-}
-
-void Rectangle::setPositions(int XY)
-{
-    X = XY;
-    Y = XY;
-}
-
-void Rectangle::setPositions(int _X, int _Y)
-{
-    X = _X;
-    Y = _Y;
-}
-
-void Rectangle::setPositions(int _X, int _Y, int _Z)
-{
-    X = _X;
-    Y = _Y;
-    Z_index = _Z;
-}
-
-void Rectangle::setRotation(int Z)
-{
-    Z_rotate = Z;
-}
-
-void Rectangle::setRotations(int X, int Y, int Z)
-{
-    X_rotate = X;
-    Y_rotate = Y;
-    Z_rotate = Z;
-}
-
 void Rectangle::setSizes(int X, int Y)
 {
     X_size = X;
@@ -486,16 +262,15 @@ void Rectangle::setSizes(int XY)
 
 
 
-Circle::Circle() :Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), X_size(100), Y_size(100), Texture(""), X(0), Y(0) {
-
+Circle::Circle() : X_size(100) , Y_size(100) {
 
     Program::sub_objects.push_back(this);
     float sqr_ver_buf[] =
     {
-      1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.9f, 0.0f, 0.0f,
-      0.9f, 0.9f, 1.0f, 0.0f,
-      0.9f, 1.0f, 1.0f, 1.0f,
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
     };
 
 
@@ -523,37 +298,6 @@ Circle::Circle() :Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotat
 }
 
 
-void Circle::updateTexture()
-{
-    if (Texture == "")
-    {
-        setUniform1b("has_texture", false);
-    }
-    else
-    {
-        setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true , getTextureSlot(Texture));
-    }
-    prev_Texture = Texture;
-}
-
-
-void Circle::updateColors()
-{
-    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
-}
-
-
-void Circle::updateRotation()
-{
-    glm::mat4 mvp =
-        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-        * proj;
-    setUniformMatrix4fv("mvp", mvp);
-}
-
 void Circle::updateVertexBuffer()
 {
     const int _X_size = X_size / 2;
@@ -573,10 +317,10 @@ void Circle::updateVertexBuffer()
 
     float sqr_ver_buf[] =
     {
-      X_2, Y_2, 0.0f, 1.0f,
-      X_2, Y_1, 0.0f, 0.0f,
-      X_1, Y_1 , 1.0f, 0.0f,
-      X_1, Y_2, 1.0f, 1.0f,
+      X_2, Y_2,1.0f, 1.0f,
+      X_2, Y_1,1.0f, 0.0f,
+      X_1, Y_1,0.0f, 0.0f,
+      X_1, Y_2,0.0f, 1.0f
     };
 
     if (Transform_from_middle) {
@@ -620,86 +364,6 @@ void Circle::draw()
     Object::draw();
 }
 
-void Circle::removeTexture()
-{
-    Texture = "";
-}
-
-void Circle::setColors(int c_R, int c_G, int c_B)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-}
-
-void Circle::setColors(int RGB)
-{
-    R = RGB;
-    G = RGB;
-    B = RGB;
-}
-
-void Circle::setColors(int c_R, int c_G, int c_B, int c_A)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-    A = c_A;
-}
-
-void Circle::setColorsTexture(int c_R, int c_G, int c_B)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-}
-
-void Circle::setColorsTexture(int RGB)
-{
-    Texture_colors.R = RGB;
-    Texture_colors.G = RGB;
-    Texture_colors.B = RGB;
-}
-
-void Circle::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-    Texture_colors.A = c_A;
-}
-
-void Circle::setPositions(int XY)
-{
-    X = XY;
-    Y = XY;
-}
-
-void Circle::setPositions(int _X, int _Y)
-{
-    X = _X;
-    Y = _Y;
-}
-
-void Circle::setPositions(int _X, int _Y, int _Z)
-{
-    X = _X;
-    Y = _Y;
-    Z_index = _Z;
-}
-
-void Circle::setRotation(int Z)
-{
-    Z_rotate = Z;
-}
-
-void Circle::setRotations(int X, int Y, int Z)
-{
-    X_rotate = X;
-    Y_rotate = Y;
-    Z_rotate = Z;
-}
-
 void Circle::setSizes(int X, int Y)
 {
     X_size = X;
@@ -713,11 +377,9 @@ void Circle::setSizes(int XY)
     Y_size = XY;
 }
 
-void Circle::updateTextureColors() {
-    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
 
-Triangle::Triangle() : Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), Size(100), Texture(""), X(0), Y(0) {
+
+Triangle::Triangle() : Size(100) {
 
     Program::sub_objects.push_back(this);
     float sqr_ver_buf[] =
@@ -753,35 +415,6 @@ Triangle::Triangle() : Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_
 }
 
 
-void Triangle::updateTexture()
-{
-    if (Texture == "")
-    {
-        setUniform1b("has_texture", false);
-    }
-    else
-    {
-        setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true);
-    }
-    prev_Texture = Texture;
-}
-
-
-void Triangle::updateColors()
-{
-    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
-}
-
-void Triangle::updateRotation()
-{
-    glm::mat4 mvp =
-        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-        * proj;
-    setUniformMatrix4fv("mvp", mvp);
-}
 
 void Triangle::updateVertexBuffer()
 {
@@ -858,101 +491,19 @@ void Triangle::draw()
     Object::draw();
 }
 
-void Triangle::removeTexture()
-{
-    Texture = "";
-}
-
-void Triangle::setColors(int c_R, int c_G, int c_B)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-}
-
-void Triangle::setColors(int RGB)
-{
-    R = RGB;
-    G = RGB;
-    B = RGB;
-}
-
-void Triangle::setColors(int c_R, int c_G, int c_B, int c_A)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-    A = c_A;
-}
-
-void Triangle::setColorsTexture(int c_R, int c_G, int c_B)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-}
-
-void Triangle::setColorsTexture(int RGB)
-{
-    Texture_colors.R = RGB;
-    Texture_colors.G = RGB;
-    Texture_colors.B = RGB;
-}
-
-void Triangle::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-    Texture_colors.A = c_A;
-}
-
-void Triangle::setPositions(int XY)
-{
-    X = XY;
-    Y = XY;
-}
-
-void Triangle::setPositions(int _X, int _Y)
-{
-    X = _X;
-    Y = _Y;
-}
-
-void Triangle::setPositions(int _X, int _Y, int _Z)
-{
-    X = _X;
-    Y = _Y;
-    Z_index = _Z;
-}
-
-void Triangle::setRotation(int Z)
-{
-    Z_rotate = Z;
-}
-
-void Triangle::setRotations(int X, int Y, int Z)
-{
-    X_rotate = X;
-    Y_rotate = Y;
-    Z_rotate = Z;
-}
 
 
-void Triangle::updateTextureColors() {
-    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
 
 
-Parallelogram::Parallelogram() : Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), Size(100), Texture(""), X(0), Y(0) {
+Parallelogram::Parallelogram() : Size(100) {
 
     Program::sub_objects.push_back(this);
     float sqr_ver_buf[] =
     {
-      1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.9f, 0.0f, 0.0f,
-      0.9f, 0.9f, 1.0f, 0.0f,
-      0.9f, 1.0f, 1.0f, 1.0f,
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
     };
 
 
@@ -982,36 +533,6 @@ Parallelogram::Parallelogram() : Z_rotate(0), Transform_from_middle(true), Y_rot
 
 }
 
-
-void Parallelogram::updateTexture()
-{
-    if (Texture == "")
-    {
-        setUniform1b("has_texture", false);
-    }
-    else
-    {
-        setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true);
-    }
-    prev_Texture = Texture;
-}
-
-
-void Parallelogram::updateColors()
-{
-    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
-}
-
-void Parallelogram::updateRotation()
-{
-    glm::mat4 mvp =
-        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-        * proj;
-    setUniformMatrix4fv("mvp", mvp);
-}
 
 void Parallelogram::updateVertexBuffer()
 {
@@ -1083,87 +604,13 @@ void Parallelogram::draw()
     Object::draw();
 }
 
-void Parallelogram::removeTexture()
-{
-    Texture = "";
-}
 
-void Parallelogram::setColors(int c_R, int c_G, int c_B)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-}
-
-void Parallelogram::setColors(int RGB)
-{
-    R = RGB;
-    G = RGB;
-    B = RGB;
-}
-
-void Parallelogram::setColors(int c_R, int c_G, int c_B, int c_A)
-{
-    R = c_R;
-    G = c_G;
-    B = c_B;
-    A = c_A;
-}
-
-void Parallelogram::setColorsTexture(int c_R, int c_G, int c_B)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-}
-
-void Parallelogram::setColorsTexture(int RGB)
-{
-    Texture_colors.R = RGB;
-    Texture_colors.G = RGB;
-    Texture_colors.B = RGB;
-}
-
-void Parallelogram::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
-{
-    Texture_colors.R = c_R;
-    Texture_colors.G = c_G;
-    Texture_colors.B = c_B;
-    Texture_colors.A = c_A;
-}
-
-void Parallelogram::setPositions(int XY)
-{
-    X = XY;
-    Y = XY;
-}
-
-void Parallelogram::setPositions(int _X, int _Y)
-{
-    X = _X;
-    Y = _Y;
-}
-
-void Parallelogram::setPositions(int _X, int _Y, int _Z)
-{
-    X = _X;
-    Y = _Y;
-    Z_index = _Z;
-}
-
-void Parallelogram::setRotation(int Z)
-{
-    Z_rotate = Z;
-}
-
-void Parallelogram::setRotations(int X, int Y, int Z)
-{
-    X_rotate = X;
-    Y_rotate = Y;
-    Z_rotate = Z;
-}
-
-
-void Parallelogram::updateTextureColors() {
-    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
+/*
+    float sqr_ver_buf[] =
+    {
+      1.0f, 1.0f, 0.0f, 1.0f,
+      1.0f, 0.9f, 0.0f, 0.0f,
+      0.9f, 0.9f, 1.0f, 0.0f,
+      0.9f, 1.0f, 1.0f, 1.0f,
+    };
+*/

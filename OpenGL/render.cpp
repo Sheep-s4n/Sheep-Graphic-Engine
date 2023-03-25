@@ -4,14 +4,14 @@
 
 Square* testing;
 Square* lightning;
-Circle* help;
+Rectangle* help;
 Rectangle* a_square;
 Circle* circle2;
 Triangle* tri_1;
 Triangle* tri_2;
 Triangle* tri_3;
 Parallelogram* testing_this_sh__;
-Animator<Circle>* deja_vu;
+Animator<Rectangle>* deja_vu;
 
 void Program::onStartup()
 {
@@ -58,18 +58,19 @@ void Program::onStartup()
     tri_3 = copyShape(tri_2);
     tri_3->X += 100;
 
-    help = new Circle();
+    help = new Rectangle();
     help->setPositions(350);
     help->A = 0;
-    help->X_size *= 2;
-    help->Texture_colors.G = 0;
-    help->Texture_colors.B = 0;
-
-
-    deja_vu = new Animator<Circle>(help);
-    deja_vu->addFrame("shaun.png");
-
-    help->Texture = "satoru.jpg";
+    help->X_size = 700;
+    help->Y_size = 300;
+    
+    deja_vu = new Animator<Rectangle>(help);
+    deja_vu->addFrame("anim1.png");
+    deja_vu->addFrame("anim2.png");
+    deja_vu->addFrame("anim3.png");
+    deja_vu->addFrame("anim4.png");
+    deja_vu->addFrame("anim5.png");
+    deja_vu->addFrame("anim6.png");
 }
 
 void Program::onUpdate()
@@ -77,7 +78,7 @@ void Program::onUpdate()
     lightning->setRotations(0, lightning->Y_rotate + 1, 0);
     a_square->X_size += 3;
     if (a_square->X_size > width) a_square->X_size = 0;
-    deja_vu->nextFrame(100); 
+    deja_vu->nextFrame(40); 
 }
 
 void Program::onFinish()

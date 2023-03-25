@@ -8,14 +8,6 @@
 
 
 
-struct Texture_colors 
-{
-	int R;
-	int G;
-	int B;
-	int A;
- };
-
 struct Coordinates 
 {
 	int X;
@@ -43,236 +35,71 @@ struct Triangle_Coordinates
 
 class Square : public Object {
 private :
-	void updateTexture();
-	void updateColors();
-	void updateRotation();
 	void updateVertexBuffer();
-	void updateTextureColors();
-	int prev_X;
-	int prev_Y;
-	int prev_Z_index;
 	int prev_Size;
-	std::string prev_Texture;
-	glm::mat4 proj;
 public:
 	void draw();
-	void removeTexture();
-	void setColors(int RGB);
-	void setColors(int R, int G, int B);
-	void setColors(int R, int G, int B, int A);
-	void setColorsTexture(int RGB);
-	void setColorsTexture(int R, int G, int B);
-	void setColorsTexture(int R, int G, int B, int A);
-	void setPositions(int XY);
-	void setPositions(int X, int Y);
-	void setPositions(int X, int Y, int Z);
-	void setRotation(int Z);
-	void setRotations(int X, int Y, int Z);
 	void scale(int scaler);
 	Square();
-	int R;
-	int G;
-	int B;
-	int A;
-	int X;
-	int Y;
-	int X_rotate;
-	int Y_rotate;
-	int Z_rotate;
 	int Size;
-	std::string Texture;
-	Texture_colors Texture_colors;
-	bool Transform_from_middle;
 };
 
 class Circle : public Object {
 private:
-	void updateTexture();
-	void updateColors();
-	void updateRotation();
 	void updateVertexBuffer();
-	void updateTextureColors();
-	int prev_X;
-	int prev_Y;
-	int prev_Z_index;
 	int prev_X_size;
 	int prev_Y_size;
-	std::string prev_Texture;
-	glm::mat4 proj;
 public:
 	void draw();
-	void removeTexture();
-	void setColors(int RGB);
-	void setColors(int R, int G, int B);
-	void setColors(int R, int G, int B, int A);
-	void setColorsTexture(int RGB);
-	void setColorsTexture(int R, int G, int B);
-	void setColorsTexture(int R, int G, int B, int A);
-	void setPositions(int XY);
-	void setPositions(int X, int Y);
-	void setPositions(int X, int Y, int Z);
-	void setRotation(int Z);
-	void setRotations(int X, int Y, int Z);
 	void setSizes(int X, int Y);
 	void setSizes(int XY);
 	void scale(int scaler);
 	Circle();
-	int R;
-	int G;
-	int B;
-	int A;
-	int X;
-	int Y;
-	int X_rotate;
-	int Y_rotate;
-	int Z_rotate;
 	int X_size;
 	int Y_size;
-	std::string Texture;
-	Texture_colors Texture_colors;
-	bool Transform_from_middle;
 };
 
 class Rectangle : public Object {
 private:
-	void updateTexture();
-	void updateColors();
-	void updateRotation();
 	void updateVertexBuffer();
-	void updateTextureColors();
-	int prev_X;
-	int prev_Y;
-	int prev_Z_index;
 	int prev_X_size;
 	int prev_Y_size;
-	std::string prev_Texture;
-	glm::mat4 proj;
 public:
 	void draw();
-	void removeTexture();
-	void setColors(int RGB);
-	void setColors(int R, int G, int B);
-	void setColors(int R, int G, int B, int A);
-	void setColorsTexture(int RGB);
-	void setColorsTexture(int R, int G, int B);
-	void setColorsTexture(int R, int G, int B, int A);
-	void setPositions(int XY);
-	void setPositions(int X, int Y);
-	void setPositions(int X, int Y, int Z);
-	void setRotation(int Z);
-	void setRotations(int X, int Y, int Z);
 	void setSizes(int X, int Y);
 	void setSizes(int XY);
 	void scale(int scaler);
 	Rectangle();
-	int R;
-	int G;
-	int B;
-	int A;
-	int X;
-	int Y;
-	int X_rotate;
-	int Y_rotate;
-	int Z_rotate;
 	int X_size;
 	int Y_size;
-	std::string Texture;
-	Texture_colors Texture_colors;
-	bool Transform_from_middle;
 };
 
 class Triangle : public Object {
 private:
-	void updateTexture();
-	void updateColors();
-	void updateRotation();
 	void updateVertexBuffer();
-	void updateTextureColors();
-	int prev_X;
-	int prev_Y;
-	int prev_Z_index;
 	int prev_Size;
 	int shape_coordinate[6];
 	Triangle_Coordinates prev_triangle_coordinates;
-	std::string prev_Texture;
-	glm::mat4 proj;
 public:
 	void draw();
-	void removeTexture();
-	void setColors(int RGB);
-	void setColors(int R, int G, int B);
-	void setColors(int R, int G, int B, int A);
-	void setColorsTexture(int RGB);
-	void setColorsTexture(int R, int G, int B);
-	void setColorsTexture(int R, int G, int B, int A);
-	void setPositions(int XY);
-	void setPositions(int X, int Y);
-	void setPositions(int X, int Y, int Z);
-	void setRotation(int Z);
-	void setRotations(int X, int Y, int Z);
 	void scale(int scaler);
 	Triangle();
-	int R;
-	int G;
-	int B;
-	int A;
-	int X;
-	int Y;
-	int X_rotate;
-	int Y_rotate;
-	int Z_rotate;
 	int Size;
-	Texture_colors Texture_colors;
-	std::string Texture;
 	Triangle_Coordinates triangle_coordinates;
-	bool Transform_from_middle;
 };
 
 class Parallelogram : public Object {
 private:
-	void updateTexture();
-	void updateColors();
-	void updateRotation();
 	void updateVertexBuffer();
-	void updateTextureColors();
-	int prev_X;
-	int prev_Y;
-	int prev_Z_index;
 	int prev_Size;
 	int shape_coordinate[8];
 	Parallelogram_Coordinates prev_triangle_coordinates;
-	std::string prev_Texture;
-	glm::mat4 proj;
 public:
-	void draw();
-	void removeTexture();
-	void setColors(int RGB);
-	void setColors(int R, int G, int B);
-	void setColors(int R, int G, int B, int A);
-	void setColorsTexture(int RGB);
-	void setColorsTexture(int R, int G, int B);
-	void setColorsTexture(int R, int G, int B, int A);
-	void setPositions(int XY);
-	void setPositions(int X, int Y);
-	void setPositions(int X, int Y, int Z);
-	void setRotation(int Z);
-	void setRotations(int X, int Y, int Z);
-	void scale(int scaler);
 	Parallelogram();
-	int R;
-	int G;
-	int B;
-	int A;
-	int X;
-	int Y;
-	int X_rotate;
-	int Y_rotate;
-	int Z_rotate;
+	void draw();
+	void scale(int scaler);
 	int Size;
-	Texture_colors Texture_colors;
-	std::string Texture;
 	Parallelogram_Coordinates parallelogram_Coordinates;
-	bool Transform_from_middle;
 };
 
 Circle* copyShape(Circle* ptr);
@@ -391,4 +218,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// - 57 - 60 call
+// - 57 - 60 call -> reduce calls

@@ -2,6 +2,7 @@
 #include <GLEW/glew.h>
 #include "abstraction.h"
 #include <iostream>
+#include "settings.h"
 
 
 Object::~Object(){
@@ -12,7 +13,7 @@ Texture* Object::getTextureI() {
     return &texture;
 }
 
-Object::Object() : is_using_dynamic_buffer(false), index_buffer_is_set(false), vertex_buffer_is_set(false) , program_id(glCreateProgram()), point_count(0) {};
+Object::Object() : Z_rotate(0), Transform_from_middle(true), Y_rotate(0), X_rotate(0), proj(glm::ortho(0.0f, width, 0.0f, height, -1.0f, 1.0f)), R(0), G(0), B(0), A(255), Texture(""), X(0), Y(0) , is_using_dynamic_buffer(false), index_buffer_is_set(false), vertex_buffer_is_set(false) , program_id(glCreateProgram()), point_count(0) {};
 
 int Object::getUniformID(std::string& name) {
     if (uniforms.find(name) == uniforms.end()) {
@@ -188,3 +189,118 @@ void Object::draw() {
 }
 
 
+void Object::removeTexture()
+{
+    Texture = "";
+}
+
+void Object::setColors(int c_R, int c_G, int c_B)
+{
+    R = c_R;
+    G = c_G;
+    B = c_B;
+}
+
+void Object::setColors(int RGB)
+{
+    R = RGB;
+    G = RGB;
+    B = RGB;
+}
+
+void Object::setColors(int c_R, int c_G, int c_B, int c_A)
+{
+    R = c_R;
+    G = c_G;
+    B = c_B;
+    A = c_A;
+}
+
+void Object::setColorsTexture(int c_R, int c_G, int c_B)
+{
+    Texture_colors.R = c_R;
+    Texture_colors.G = c_G;
+    Texture_colors.B = c_B;
+}
+
+void Object::setColorsTexture(int RGB)
+{
+    Texture_colors.R = RGB;
+    Texture_colors.G = RGB;
+    Texture_colors.B = RGB;
+}
+
+void Object::setColorsTexture(int c_R, int c_G, int c_B, int c_A)
+{
+    Texture_colors.R = c_R;
+    Texture_colors.G = c_G;
+    Texture_colors.B = c_B;
+    Texture_colors.A = c_A;
+}
+
+void Object::setPositions(int XY)
+{
+    X = XY;
+    Y = XY;
+}
+
+void Object::setPositions(int _X, int _Y)
+{
+    X = _X;
+    Y = _Y;
+}
+
+void Object::setPositions(int _X, int _Y, int _Z)
+{
+    X = _X;
+    Y = _Y;
+    Z_index = _Z;
+}
+
+void Object::setRotation(int Z)
+{
+    Z_rotate = Z;
+}
+
+void Object::setRotations(int X, int Y, int Z)
+{
+    X_rotate = X;
+    Y_rotate = Y;
+    Z_rotate = Z;
+}
+
+void Object::updateTextureColors() {
+    setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
+};
+
+
+
+void Object::updateTexture()
+{
+    if (Texture == "")
+    {
+        setUniform1b("has_texture", false);
+    }
+    else
+    {
+        setUniform1b("has_texture", true);
+        setTexture(Texture, "c_texture", true);
+    }
+    prev_Texture = Texture;
+}
+
+
+void Object::updateColors()
+{
+    setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
+}
+
+void Object::updateRotation()
+{
+    glm::mat4 mvp =
+        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
+        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
+        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
+        * proj;
+    setUniformMatrix4fv("mvp", mvp);
+}

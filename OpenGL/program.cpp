@@ -12,7 +12,7 @@ void Program::renderShapes()
 
     std::sort(Program::sub_objects.begin(), Program::sub_objects.end(), compareObjectZ_index);
     for (Object* obj : Program::sub_objects) {
-        obj->draw(); // draw object
+        obj->draw();
     }
 }
 
