@@ -532,7 +532,7 @@ void Circle::updateTexture()
     else
     {
         setUniform1b("has_texture", true);
-        setTexture(Texture, "c_texture", true);
+        setTexture(Texture, "c_texture", true , getTextureSlot(Texture));
     }
     prev_Texture = Texture;
 }

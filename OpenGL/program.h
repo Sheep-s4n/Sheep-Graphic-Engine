@@ -25,9 +25,10 @@ private:
 	int frame_count;
 	bool has_frame = false;
 public:
-	Animator(T* _shape) : shape(_shape), frame_count(0), next_texture_sloat_available(0), current_texture_sloat(0)
+	Animator(T* _shape) : shape(_shape), frame_count(99999), next_texture_sloat_available(0), current_texture_sloat(0)
 	{
 		Program::sub_objects.push_back(this);
+		shape->Texture = "";
 	};
 	~Animator()
 	{
@@ -39,19 +40,16 @@ public:
 	};
 	void nextFrame(int switch_interval)
 	{
+		if (shape->Texture != "") return; // not changing if the shape has already a texture
 		frame_count++;
 		if (frame_count <= switch_interval) return;
 		frame_count = 0;
 		if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
 		int max_it = 32;
-		while (myMap.count(current_texture_sloat) < 1) {
+		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].image_path == "") {
 			current_texture_sloat++;
 			if (++max_it < 1) break;
 		}
-		//shape->Texture = myMap[current_texture_sloat].image_path;
-		int uniformLocation = glGetUniformLocation(shape->program_id, "c_texture"); // integer uniform = texture slot 
-		glProgramUniform1i(shape->program_id, uniformLocation, myMap[current_texture_sloat].sloat);
-		shape->setUniform1f("c_texture", (float)1.0f);
 		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
 		current_texture_sloat++;
 	};

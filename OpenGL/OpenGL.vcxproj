@@ -209,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Lightning.png" />
+    <Image Include="satoru.jpg" />
     <Image Include="shaun.png" />
     <Image Include="sheep.png" />
   </ItemGroup>

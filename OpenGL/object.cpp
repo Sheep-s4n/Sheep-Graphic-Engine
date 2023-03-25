@@ -103,11 +103,18 @@ void Object::setTexture(const std::string path , std::string name , bool flipIma
     if(texture.textures.count(path) > 0)
     {
         texture.texture_id = texture.textures[path].texture_id;
+        setUniform1i("c_texture", slot);
     }
     else 
     {
         texture.setTexture( path , program_id ,name ,flipImage, slot );
     }
+}
+
+int Object::getTextureSlot(const std::string path) 
+{
+    if (texture.textures.count(path) > 0) return texture.textures[path].slot;
+    return texture.textures.size();
 }
 
 
@@ -129,6 +136,14 @@ void Object::setUniform1f(std::string name, float value) {
 }
 
 void Object::setUniform1b(std::string name, bool value) {
+    glProgramUniform1i(
+        program_id,
+        getUniformID(name),
+        value
+    );
+}
+
+void Object::setUniform1i(std::string name, int value) {
     glProgramUniform1i(
         program_id,
         getUniformID(name),

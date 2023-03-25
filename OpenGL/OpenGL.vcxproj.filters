@@ -180,6 +180,9 @@
     <Image Include="Lightning.png">
       <Filter>media</Filter>
     </Image>
+    <Image Include="satoru.jpg">
+      <Filter>media</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Dependencies\ImGUI\LICENSE.txt">
