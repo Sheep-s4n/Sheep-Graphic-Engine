@@ -50,7 +50,6 @@ void Program::onStartup()
     tri_1->triangle_coordinates.top.Y = 70;
     tri_1->Transform_from_middle = false;
 
-
     tri_2 = copyShape(tri_1);
     tri_2->X -= 50;
     tri_2->Y -= 70;
@@ -76,6 +75,7 @@ void Program::onStartup()
 void Program::onUpdate()
 {
     lightning->setRotations(0, lightning->Y_rotate + 1, 0);
+    help->Texture_colors.G -= 1;
     a_square->X_size += 3;
     if (a_square->X_size > width) a_square->X_size = 0;
     deja_vu->nextFrame(40); 

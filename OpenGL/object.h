@@ -15,6 +15,7 @@ struct Texture_colors
 };
 
 class Object {
+friend class Camera;
 protected :
 
 	int prev_X;
@@ -29,7 +30,9 @@ protected :
 	void updateColors();
 	void updateRotation();
 	void updateTextureColors();
-
+	bool colorChanged();
+	bool rotationChanged();
+	bool textureColorsChanged();
 
 
 	int point_count;
@@ -57,18 +60,17 @@ protected :
 	void setUniform1i(std::string name, int value);
 	void setUniform2f(std::string name, float value1, float value2);
 	void setUniform4f(std::string name, float value1, float value2, float value3, float value4);
+	void setUniformMatrix4fv(std::string name, glm::mat4& first_value);
 	int getTextureSlot(std::string path);
 	int getUniformID(std::string& name);
 	Texture* getTextureI();
 
 public:
-	void setUniformMatrix4fv(std::string name, glm::mat4& first_value);
-	void setUniform1b(std::string name, bool value);
-	void setTexture(const std::string path, std::string name, bool flipImage, int slot = 0);
 	virtual ~Object();
 	Object();
 	
-
+	void setUniform1b(std::string name, bool value);
+	void setTexture(const std::string path, std::string name, bool flipImage, int slot = 0);
 	void removeTexture();
 	void setColors(int RGB);
 	void setColors(int R, int G, int B);

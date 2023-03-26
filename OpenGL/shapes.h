@@ -102,6 +102,20 @@ public:
 	Parallelogram_Coordinates parallelogram_Coordinates;
 };
 
+class Shape : public Object {
+private:
+	void updateVertexBuffer();
+	int prev_Size;
+	std::vector<Coordinates> prev_shape_coordinates;
+public:
+	Shape();
+	void draw();
+	void scale(int scaler);
+	int Size;
+	std::vector<Coordinates> shape_Coordinates;
+};
+
+
 Circle* copyShape(Circle* ptr);
 Rectangle* copyShape(Rectangle* ptr);
 Square* copyShape(Square* ptr);
@@ -218,4 +232,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// - 57 - 60 call -> reduce calls
+// finish shape class

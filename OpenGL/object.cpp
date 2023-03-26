@@ -3,7 +3,7 @@
 #include "abstraction.h"
 #include <iostream>
 #include "settings.h"
-
+#define Size(x , type) (sizeof(x) / sizeof(type))
 
 Object::~Object(){
     glDeleteProgram(program_id);
@@ -271,8 +271,46 @@ void Object::setRotations(int X, int Y, int Z)
 
 void Object::updateTextureColors() {
     setUniform4f("t_color", (float)Texture_colors.R / 255, (float)Texture_colors.G / 255, (float)Texture_colors.B / 255, (float)Texture_colors.A / 255);
-};
+    prev_texture_colors[0] = Texture_colors.R;
+    prev_texture_colors[1] = Texture_colors.G;
+    prev_texture_colors[2] = Texture_colors.B;
+    prev_texture_colors[3] = Texture_colors.A;
+}
 
+
+
+
+bool Object::colorChanged()
+{
+    if (
+        R != prev_colors[0] || 
+        G != prev_colors[1] || 
+        B != prev_colors[2] || 
+        A != prev_colors[3]
+        ) return true;
+    return false;
+}
+
+bool Object::rotationChanged()
+{
+    if (
+        X_rotate != prev_rotation[0] ||
+        Y_rotate != prev_rotation[1] ||
+        Z_rotate != prev_rotation[2]
+        ) return true;
+    return false;
+}
+
+bool Object::textureColorsChanged()
+{
+    if (
+        Texture_colors.R != prev_texture_colors[0] ||
+        Texture_colors.G != prev_texture_colors[1] ||
+        Texture_colors.B != prev_texture_colors[2] ||
+        Texture_colors.A != prev_texture_colors[3]
+        ) return true;
+    return false;
+}
 
 
 void Object::updateTexture()
@@ -293,6 +331,10 @@ void Object::updateTexture()
 void Object::updateColors()
 {
     setUniform4f("u_color", (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
+    prev_colors[0] = R;
+    prev_colors[1] = G;
+    prev_colors[2] = B;
+    prev_colors[3] = A;
 }
 
 void Object::updateRotation()
@@ -303,4 +345,8 @@ void Object::updateRotation()
         * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
         * proj;
     setUniformMatrix4fv("mvp", mvp);
+
+    prev_rotation[0] = X_rotate;
+    prev_rotation[1] = Y_rotate;
+    prev_rotation[2] = Z_rotate;
 }

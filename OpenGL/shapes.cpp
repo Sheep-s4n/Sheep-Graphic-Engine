@@ -144,10 +144,9 @@ void Square::draw()
         prev_Size != Size
     ) updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture(); 
-
-    updateColors();
-    updateRotation();
-    updateTextureColors();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
     Object::draw();
 }
 
@@ -240,10 +239,9 @@ void Rectangle::draw()
         prev_Y_size != Y_size
         ) updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture();
-
-    updateColors();
-    updateRotation();
-    updateTextureColors();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
     Object::draw();
 }
 
@@ -357,10 +355,9 @@ void Circle::draw()
         prev_Y_size != Y_size
         ) updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture();
-
-    updateColors();
-    updateRotation();
-    updateTextureColors();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
     Object::draw();
 }
 
@@ -484,10 +481,9 @@ void Triangle::draw()
         triangle_coordinates.bottom_left.Y != prev_triangle_coordinates.bottom_left.Y
     )updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture();
-
-    updateColors();
-    updateRotation();
-    updateTextureColors();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
     Object::draw();
 }
 
@@ -597,20 +593,10 @@ void Parallelogram::draw()
         parallelogram_Coordinates.bottom_left.Y != prev_triangle_coordinates.bottom_left.Y
         )updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture();
-
-    updateColors();
-    updateRotation();
-    updateTextureColors();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
     Object::draw();
 }
 
 
-/*
-    float sqr_ver_buf[] =
-    {
-      1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.9f, 0.0f, 0.0f,
-      0.9f, 0.9f, 1.0f, 0.0f,
-      0.9f, 1.0f, 1.0f, 1.0f,
-    };
-*/

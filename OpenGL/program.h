@@ -46,7 +46,7 @@ public:
 		frame_count = 0;
 		if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
 		int max_it = 32;
-		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].image_path == "") {
+		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].sloat == -1) {
 			current_texture_sloat++;
 			if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
 			if (--max_it < 1) return;
@@ -56,7 +56,7 @@ public:
 	};
 	void removeFrame(int _sloat)
 	{
-		myMap[_sloat].image_path = "";
+		myMap[_sloat].sloat = -1;
 	}
 	void removeFrame(std::string image_path)
 	{
@@ -67,15 +67,15 @@ public:
 				break;
 			};
 		};
-		myMap[key].image_path = "";
+		myMap[key].sloat = -1;
 	}
-	void restoreFrame(int _sloat , std::string image_path)
+	void restoreFrame(int _sloat)
 	{
-		myMap[_sloat].image_path = image_path;
+		myMap[_sloat].sloat = _sloat;
 	}
 	void nextFrameReverseOrder(int switch_interval)
 	{
-		if (shape->Texture != "") return; // not changing if the shape has already a texture
+		if (shape->Texture != "") return;
 		frame_count++;
 		if (frame_count <= switch_interval) return;
 		frame_count = 0;
