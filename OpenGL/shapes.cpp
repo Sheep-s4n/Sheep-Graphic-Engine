@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "program.h"
 #define TF(x) (float)x / 100
+#define Resolve(i , size) ()
 
 template<class T>
 T* copyBasicPropreties(T* shape){
@@ -600,3 +601,121 @@ void Parallelogram::draw()
 }
 
 
+Shape::Shape() : Size(100) {
+
+    Program::sub_objects.push_back(this);
+    float sqr_ver_buf[] =
+    {
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
+    };
+
+
+    unsigned int sqr_ind_buf[] = // has to be unsigned
+    {
+         0,1,2,
+         2,3,0,
+    };
+
+    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    setVertexBufferLayout(0, 2, sizeof(float) * 4);
+    setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
+    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
+    setShader("F_square.shader", GL_FRAGMENT_SHADER);
+    setShader("V_square.shader", GL_VERTEX_SHADER);
+
+
+    prev_X = X;
+    prev_Y = Y;
+    prev_Size = Size;
+    prev_Texture = Texture;
+    Texture_colors = { 255 , 255 ,255 ,255 };
+}
+
+
+void Shape::updateVertexBuffer()
+{
+    std::vector<Coordinates> coordinates;
+
+    if (!Transform_from_middle)
+    {
+        for (Coordinates coord : shape_Coordinates)
+        {
+            Coordinates final_coord = {
+                { coord.X * TF(Size) + X },
+                { coord.Y * TF(Size) + Y }
+            };
+            coordinates.emplace_back(final_coord);
+        }
+    }
+    else
+    {
+        for (Coordinates coord : shape_Coordinates)
+        {
+            Coordinates final_coord = {
+                { (coord.X * TF(Size) + X) - Size / 2 },
+                { (coord.Y * TF(Size) + Y) - Size / 2 }
+            };
+            coordinates.emplace_back(final_coord);
+        }
+    };
+
+
+    int size = coordinates.size() * 4;
+    std::cout << size << std::endl;
+    float* sqr_ver_buf = new float[size];
+    for (int i = 0 ;i < size; i+=4)
+    {
+        int vector_index = i / 4;
+        sqr_ver_buf[i] =   (float)coordinates[vector_index].X; 
+        sqr_ver_buf[i+1] = (float)coordinates[vector_index].Y;
+        sqr_ver_buf[i+2] = TF(shape_Coordinates[vector_index].X);
+        sqr_ver_buf[i+3] = TF(shape_Coordinates[vector_index].Y);
+    }
+
+
+    unsigned int sqr_ind_buf[] = // has to be unsigned
+    {
+         0,1,2,
+         2,3,0,
+    };
+
+    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
+
+    //float sqr_ver_buf[] =
+    //{
+    //  coordinates[0], coordinates[1], TF(shape_coordinate[0]), TF(shape_coordinate[1]),
+    //  coordinates[2], coordinates[3], TF(shape_coordinate[2]), TF(shape_coordinate[3]),
+    //  coordinates[4], coordinates[5], TF(shape_coordinate[4]), TF(shape_coordinate[5]),
+    //  coordinates[6], coordinates[7], TF(shape_coordinate[6]), TF(shape_coordinate[7]),
+    //};
+
+   // setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    prev_X = X;
+    prev_Y = Y;
+    prev_Size = Size;
+    prev_shape_coordinates = shape_Coordinates;
+    delete[] sqr_ver_buf;
+}
+
+void Shape::scale(int scaler) {
+    Size *= scaler;
+}
+
+
+void Shape::draw()
+{
+    //if (
+    //    prev_X != X ||
+    //    prev_Y != Y ||
+    //    prev_Size != Size
+    //    )
+    updateVertexBuffer();
+    if (prev_Texture != Texture) updateTexture();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
+    Object::draw();
+}

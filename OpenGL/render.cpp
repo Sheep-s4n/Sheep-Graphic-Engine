@@ -12,6 +12,7 @@ Triangle* tri_2;
 Triangle* tri_3;
 Parallelogram* testing_this_sh__;
 Animator<Rectangle>* deja_vu;
+Shape* python_is_not_an_IDE;
 
 void Program::onStartup()
 {
@@ -70,6 +71,9 @@ void Program::onStartup()
     deja_vu->addFrame("anim4.png");
     deja_vu->addFrame("anim5.png");
     deja_vu->addFrame("anim6.png");
+
+    python_is_not_an_IDE = new Shape();
+
 }
 
 void Program::onUpdate()

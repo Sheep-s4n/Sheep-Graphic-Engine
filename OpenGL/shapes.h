@@ -112,7 +112,7 @@ public:
 	void draw();
 	void scale(int scaler);
 	int Size;
-	std::vector<Coordinates> shape_Coordinates;
+	std::vector<Coordinates> shape_Coordinates = { {0, 0} ,{0, 70} , { 50 ,100 } , {100 ,70} , {100 ,0} };
 };
 
 
