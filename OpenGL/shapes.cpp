@@ -489,9 +489,6 @@ void Triangle::draw()
 }
 
 
-
-
-
 Parallelogram::Parallelogram() : Size(100) {
 
     Program::sub_objects.push_back(this);
@@ -604,28 +601,16 @@ void Parallelogram::draw()
 Shape::Shape() : Size(100) {
 
     Program::sub_objects.push_back(this);
-    float sqr_ver_buf[] =
-    {
-      1.0f, 1.0f, 1.0f, 1.0f,
-      1.0f, 0.9f, 1.0f, 0.0f,
-      0.9f, 0.9f, 0.0f, 0.0f,
-      0.9f, 1.0f, 0.0f, 1.0f,
-    };
+    float sqr_ver_buf[4020];
 
-
-    unsigned int sqr_ind_buf[] = // has to be unsigned
-    {
-         0,1,2,
-         2,3,0,
-    };
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
     setVertexBufferLayout(0, 2, sizeof(float) * 4);
     setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
-    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
     setShader("F_square.shader", GL_FRAGMENT_SHADER);
     setShader("V_square.shader", GL_VERTEX_SHADER);
-
+    glm::mat4 mvp = proj;
+    setUniformMatrix4fv("mvp", mvp);
 
     prev_X = X;
     prev_Y = Y;
@@ -664,7 +649,6 @@ void Shape::updateVertexBuffer()
 
 
     int size = coordinates.size() * 4;
-    std::cout << size << std::endl;
     float* sqr_ver_buf = new float[size];
     for (int i = 0 ;i < size; i+=4)
     {
@@ -675,24 +659,150 @@ void Shape::updateVertexBuffer()
         sqr_ver_buf[i+3] = TF(shape_Coordinates[vector_index].Y);
     }
 
-
-    unsigned int sqr_ind_buf[] = // has to be unsigned
+    elm_count = (size / 4) + 1;
+    unsigned int* sqr_ind_buf = new unsigned int[elm_count];
+    sqr_ind_buf[0] = 0;
+    for (int i = 1; i < elm_count - 1; i++)
     {
-         0,1,2,
-         2,3,0,
+        sqr_ind_buf[i] = i;
+    }
+    sqr_ind_buf[elm_count - 1] = 1;
+
+    setDynamicIndexBuffer(sqr_ind_buf, (size / 4 + 1) * sizeof(unsigned int));
+    setDynamicVertexBuffer(sqr_ver_buf, size * sizeof(float));
+
+    prev_X = X;
+    prev_Y = Y;
+    prev_Size = Size;
+    prev_shape_coordinates = shape_Coordinates;
+    delete[] sqr_ver_buf;
+    delete[] sqr_ind_buf;
+}
+
+void Shape::scale(int scaler) {
+    Size *= scaler;
+}
+
+bool Shape::shapeCoordinatesChanged()
+{
+    for (int i = 0; i < shape_Coordinates.size(); i++)
+    {
+        if (shape_Coordinates[i].X != prev_shape_coordinates[i].X) return true;
+        if (shape_Coordinates[i].Y != prev_shape_coordinates[i].Y) return true;
+    }
+    return false;
+}
+
+
+void Shape::draw()
+{
+    if (
+        prev_X != X ||
+        prev_Y != Y ||
+        prev_Size != Size || 
+        shapeCoordinatesChanged()
+    )
+    updateVertexBuffer();
+    if (prev_Texture != Texture) updateTexture();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
+    Object::draw(GL_TRIANGLE_FAN);
+};
+
+
+Polytriangle::Polytriangle() : Size(100) {
+
+    Program::sub_objects.push_back(this);
+
+    float sqr_ver_buf[4020];
+    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    setVertexBufferLayout(0, 2, sizeof(float) * 4);
+    setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
+    setShader("F_square.shader", GL_FRAGMENT_SHADER);
+    setShader("V_square.shader", GL_VERTEX_SHADER); // should be this one
+    glm::mat4 mvp = proj;
+    setUniformMatrix4fv("mvp", mvp);
+
+    prev_X = X;
+    prev_Y = Y;
+    prev_Size = Size;
+    prev_Texture = Texture;
+    Texture_colors = { 255 , 255 ,255 ,255 };
+}
+
+
+void Polytriangle::updateVertexBuffer()
+{
+    std::vector<Triangle_Coordinates> coordinates;
+
+    if (!Transform_from_middle)
+    {
+        for (const Triangle_Coordinates& triangle : shape_Coordinates)
+        {
+            Triangle_Coordinates final_coord
+                = {
+                    {
+                        { triangle.top.X * TF(Size) + X},
+                        { triangle.top.Y * TF(Size) + Y}
+                    },
+                    {
+                        { triangle.bottom_right.X * TF(Size) + X },
+                        { triangle.bottom_right.Y * TF(Size) + Y }
+                    },
+                    {
+                        { triangle.bottom_left.X * TF(Size) + X },
+                        { triangle.bottom_left.Y * TF(Size) + Y }
+                    }
+            };
+            coordinates.emplace_back(final_coord);
+        }
+    }
+    else
+    {
+        for (const Triangle_Coordinates& triangle : shape_Coordinates)
+        {
+            Triangle_Coordinates final_coord
+            = {
+                {
+                    { (triangle.top.X * TF(Size) + X) - Size / 2 },
+                    { (triangle.top.Y * TF(Size) + Y) - Size / 2 }
+                },
+                {
+                    { (triangle.bottom_right.X * TF(Size) + X) - Size / 2 },
+                    { (triangle.bottom_right.Y * TF(Size) + Y) - Size / 2 }
+                },
+                {
+                    { (triangle.bottom_left.X * TF(Size) + X) - Size / 2 },
+                    { (triangle.bottom_left.Y * TF(Size) + Y) - Size / 2 }
+                }
+            };
+            coordinates.emplace_back(final_coord);
+        }
     };
 
-    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
+    int int_count = 12;
+    int size = coordinates.size() * int_count;
+    float* sqr_ver_buf = new float[size];
+    for (int i = 0; i < size; i += int_count)
+    {
+        int vector_index = i / int_count;
 
-    //float sqr_ver_buf[] =
-    //{
-    //  coordinates[0], coordinates[1], TF(shape_coordinate[0]), TF(shape_coordinate[1]),
-    //  coordinates[2], coordinates[3], TF(shape_coordinate[2]), TF(shape_coordinate[3]),
-    //  coordinates[4], coordinates[5], TF(shape_coordinate[4]), TF(shape_coordinate[5]),
-    //  coordinates[6], coordinates[7], TF(shape_coordinate[6]), TF(shape_coordinate[7]),
-    //};
+        sqr_ver_buf[i] = (float)coordinates[vector_index].top.X;
+        sqr_ver_buf[i + 1] = (float)coordinates[vector_index].top.Y;
+        sqr_ver_buf[i + 2] = TF(shape_Coordinates[vector_index].top.X);
+        sqr_ver_buf[i + 3] = TF(shape_Coordinates[vector_index].top.Y);
+        sqr_ver_buf[i + 4] = (float)coordinates[vector_index].bottom_right.X;
+        sqr_ver_buf[i + 5] = (float)coordinates[vector_index].bottom_right.Y;
+        sqr_ver_buf[i + 6] = TF(shape_Coordinates[vector_index].bottom_right.X);
+        sqr_ver_buf[i + 7] = TF(shape_Coordinates[vector_index].bottom_right.Y);
+        sqr_ver_buf[i + 8] = (float)coordinates[vector_index].bottom_left.X;
+        sqr_ver_buf[i + 9] = (float)coordinates[vector_index].bottom_left.Y;
+        sqr_ver_buf[i + 10] = TF(shape_Coordinates[vector_index].bottom_left.X);
+        sqr_ver_buf[i + 11] = TF(shape_Coordinates[vector_index].bottom_left.Y);
+    }
 
-   // setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    setDynamicVertexBuffer(sqr_ver_buf, size * sizeof(int));
     prev_X = X;
     prev_Y = Y;
     prev_Size = Size;
@@ -700,22 +810,38 @@ void Shape::updateVertexBuffer()
     delete[] sqr_ver_buf;
 }
 
-void Shape::scale(int scaler) {
+void Polytriangle::scale(int scaler) {
     Size *= scaler;
 }
 
-
-void Shape::draw()
+bool Polytriangle::shapeCoordinatesChanged()
 {
-    //if (
-    //    prev_X != X ||
-    //    prev_Y != Y ||
-    //    prev_Size != Size
-    //    )
+    for (int i = 0; i < shape_Coordinates.size(); i++)
+    {
+        if(shape_Coordinates[i].top.X != prev_shape_coordinates[i].top.X) return true;
+        if(shape_Coordinates[i].top.Y != prev_shape_coordinates[i].top.Y) return true;
+        if(shape_Coordinates[i].bottom_right.X!= prev_shape_coordinates[i].bottom_right.X) return true;
+        if (shape_Coordinates[i].bottom_right.Y!= prev_shape_coordinates[i].bottom_right.Y)return true;
+        if (shape_Coordinates[i].bottom_left.X != prev_shape_coordinates[i].bottom_left.X) return true;
+        if (shape_Coordinates[i].bottom_left.Y != prev_shape_coordinates[i].bottom_left.Y) return true;
+
+    }
+    return false;
+}
+
+
+void Polytriangle::draw()
+{
+    if (
+        prev_X != X ||
+        prev_Y != Y ||
+        prev_Size != Size ||
+        shapeCoordinatesChanged()
+    )
     updateVertexBuffer();
     if (prev_Texture != Texture) updateTexture();
     if (colorChanged()) updateColors();
     if (rotationChanged()) updateRotation();
     if (textureColorsChanged()) updateTextureColors();
-    Object::draw();
+    drawFromVBO(shape_Coordinates.size() * 3);
 }

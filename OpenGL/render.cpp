@@ -13,6 +13,8 @@ Triangle* tri_3;
 Parallelogram* testing_this_sh__;
 Animator<Rectangle>* deja_vu;
 Shape* python_is_not_an_IDE;
+Polytriangle* hell;
+
 
 void Program::onStartup()
 {
@@ -58,6 +60,16 @@ void Program::onStartup()
     tri_3 = copyShape(tri_2);
     tri_3->X += 100;
 
+    hell = new Polytriangle();
+    hell->Size *= 2;
+    hell->setPositions(350);
+    hell->shape_Coordinates[0].bottom_left.X = 20;
+    hell->shape_Coordinates.push_back(
+        { {0, 50} ,{0, 0} , { 10 ,0 } }
+    );
+    hell->A = 200;
+    hell->Texture_colors.A = 0;
+
     help = new Rectangle();
     help->setPositions(350);
     help->A = 0;
@@ -73,7 +85,7 @@ void Program::onStartup()
     deja_vu->addFrame("anim6.png");
 
     python_is_not_an_IDE = new Shape();
-
+    python_is_not_an_IDE->Transform_from_middle = false;
 }
 
 void Program::onUpdate()

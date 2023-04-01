@@ -63,6 +63,9 @@ protected :
 	void setUniformMatrix4fv(std::string name, glm::mat4& first_value);
 	int getTextureSlot(std::string path);
 	int getUniformID(std::string& name);
+	void draw(int mode);
+	void drawFromVBO(int coord_count);
+	void drawFromVBO(int coord_count , int mode);
 	Texture* getTextureI();
 
 public:

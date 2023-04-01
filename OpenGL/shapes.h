@@ -105,14 +105,32 @@ public:
 class Shape : public Object {
 private:
 	void updateVertexBuffer();
+	bool shapeCoordinatesChanged();
 	int prev_Size;
-	std::vector<Coordinates> prev_shape_coordinates;
+	int elm_count;
+	std::vector<Coordinates> prev_shape_coordinates = { {0, 0} ,{0, 0} , { 0 ,0 } , {0 ,0} , {0 ,0} };
 public:
 	Shape();
 	void draw();
 	void scale(int scaler);
 	int Size;
 	std::vector<Coordinates> shape_Coordinates = { {0, 0} ,{0, 70} , { 50 ,100 } , {100 ,70} , {100 ,0} };
+};
+
+class Polytriangle : public Object {
+private:
+	void updateVertexBuffer();
+	bool shapeCoordinatesChanged();
+	int prev_Size;
+	std::vector<Triangle_Coordinates> prev_shape_coordinates;
+public:
+	Polytriangle();
+	void draw();
+	void scale(int scaler);
+	int Size;
+	std::vector<Triangle_Coordinates> shape_Coordinates = { 
+		{{0, 100} ,{0, 0} , { 100 ,0 }} , {{0 ,100} , {100 ,100} , {100 ,0}}
+	};
 };
 
 

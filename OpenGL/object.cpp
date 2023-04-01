@@ -59,6 +59,7 @@ void Object::setDynamicIndexBuffer(unsigned int arr[], int arrSize) {
     }
 }
 
+
 void Object::setStaticVertexBuffer(float arr[], int arrSize){
     vertexArray.bind();
 
@@ -83,6 +84,44 @@ void Object::setDynamicVertexBuffer(float arr[], int arrSize) {
         is_using_dynamic_buffer = true;
     }
 }
+
+void Object::draw() {
+    if (!point_count) {
+        std::cout << "nothing to draw !" << std::endl;
+        return;
+    }
+    bind();
+    glDrawElements(GL_TRIANGLES, point_count, GL_UNSIGNED_INT, nullptr);
+}
+
+void Object::draw(int mode) {
+    if (!point_count) {
+        std::cout << "nothing to draw !" << std::endl;
+        return;
+    }
+    bind();
+    glDrawElements(mode, point_count, GL_UNSIGNED_INT, nullptr);
+}
+
+
+void Object::drawFromVBO(int coord_count) {
+    if (!coord_count) {
+        std::cout << "nothing to draw !" << std::endl;
+        return;
+    }
+    bind();
+    glDrawArrays(GL_TRIANGLES, 0, coord_count);
+}
+
+void Object::drawFromVBO(int coord_count , int mode) {
+    if (!coord_count) {
+        std::cout << "nothing to draw !" << std::endl;
+        return;
+    }
+    bind();
+    glDrawArrays(mode, 0, coord_count);
+}
+
 
 void Object::setVertexBufferLayout(int index, int vertexCount, int stride, int begin) {
     if (is_using_dynamic_buffer) {
@@ -179,14 +218,6 @@ void Object::setUniformMatrix4fv(std::string name, glm::mat4& first_value) {
 
 }
 
-void Object::draw() {
-    if (!point_count) {
-        std::cout << "nothing to draw !" << std::endl;
-        return;
-    }
-    bind();
-    glDrawElements(GL_TRIANGLES, point_count, GL_UNSIGNED_INT, nullptr);
-}
 
 
 void Object::removeTexture()
