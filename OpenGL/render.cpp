@@ -68,6 +68,7 @@ void Program::onStartup()
         { {0, 50} ,{0, 0} , { 10 ,0 } }
     );
     hell->A = 200;
+    hell->setColors(255, 0, 0);
     hell->Texture_colors.A = 0;
 
     help = new Rectangle();

@@ -7,6 +7,20 @@
 #define TF(x) (float)x / 100
 #define Resolve(i , size) ()
 
+bool windowSizeChanged(int update_width, int update_height)
+{
+    static int prev_width = width;
+    static int prev_height = height;
+    if ((prev_width != update_width) || (prev_height != update_height))
+    {
+        prev_height = update_height;
+        prev_width = update_width;
+        return true;
+    }
+    return false;
+
+}
+
 template<class T>
 T* copyBasicPropreties(T* shape){
     T* new_shape = new T();
@@ -63,6 +77,22 @@ Parallelogram* copyShape(Parallelogram* ptr)
     new_parallelogram->Size = ptr->Size;
     new_parallelogram->parallelogram_Coordinates = ptr->parallelogram_Coordinates;
     return new_parallelogram;
+}
+
+Shape* copyShape(Shape* ptr)
+{
+    Shape* new_shape = copyBasicPropreties<Shape>(ptr);
+    new_shape->Size = ptr->Size;
+    new_shape->shape_Coordinates = ptr->shape_Coordinates;
+    return new_shape;
+}
+
+Polytriangle* copyShape(Polytriangle* ptr)
+{
+    Polytriangle* new_polytriangle = copyBasicPropreties<Polytriangle>(ptr);
+    new_polytriangle->Size = ptr->Size;
+    new_polytriangle->shape_Coordinates = ptr->shape_Coordinates;
+    return new_polytriangle;
 }
 
 
@@ -322,16 +352,7 @@ void Circle::updateVertexBuffer()
       X_1, Y_2,0.0f, 1.0f
     };
 
-    if (Transform_from_middle) {
-        setUniform2f("pos", X - _X_size, Y - _Y_size);
-        setUniform2f("size", X_size, Y_size);
-    }
-    else {
-        setUniform2f("pos", X, Y);
-        setUniform2f("size", X_size, Y_size);
-    }
-
-
+    scaleUp();
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
     prev_X = X;
@@ -345,10 +366,23 @@ void Circle::scale(int scaler) {
     Y_size *= scaler;
 }
 
+void Circle::scaleUp()
+{
+    const int _X_size = X_size / 2;
+    const int _Y_size = Y_size / 2;
+    if (Transform_from_middle) {
+        setUniform2f("pos", (X - _X_size) * (update_width / width), (Y - _Y_size) * (update_height / height));
+    }
+    else {
+        setUniform2f("pos", X * (update_width / width), Y * (update_height / height));
+    }
+    setUniform2f("size", X_size * (update_width / width), Y_size * (update_height / height));
+
+}
 
 void Circle::draw()
 {
-
+    if (scale_render_on_window_resize && windowSizeChanged(update_width , update_height)) scaleUp();
     if (
         prev_X != X ||
         prev_Y != Y ||
@@ -513,7 +547,8 @@ Parallelogram::Parallelogram() : Size(100) {
     setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
     setShader("F_square.shader", GL_FRAGMENT_SHADER);
     setShader("V_square.shader", GL_VERTEX_SHADER);
-
+    glm::mat4 mvp = proj;
+    setUniformMatrix4fv("mvp", mvp);
 
     prev_X = X;
     prev_Y = Y;
@@ -720,7 +755,7 @@ Polytriangle::Polytriangle() : Size(100) {
     setVertexBufferLayout(0, 2, sizeof(float) * 4);
     setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
     setShader("F_square.shader", GL_FRAGMENT_SHADER);
-    setShader("V_square.shader", GL_VERTEX_SHADER); // should be this one
+    setShader("V_square.shader", GL_VERTEX_SHADER);
     glm::mat4 mvp = proj;
     setUniformMatrix4fv("mvp", mvp);
 

@@ -6,7 +6,10 @@
 #include "program.h"
 #define Comment(x) /* x */
 
+extern float update_height;
+extern float update_width;
 
+bool windowSizeChanged(int update_width, int update_height);
 
 struct Coordinates 
 {
@@ -47,6 +50,7 @@ public:
 class Circle : public Object {
 private:
 	void updateVertexBuffer();
+	void scaleUp();
 	int prev_X_size;
 	int prev_Y_size;
 public:
@@ -139,6 +143,9 @@ Rectangle* copyShape(Rectangle* ptr);
 Square* copyShape(Square* ptr);
 Triangle* copyShape(Triangle* ptr);
 Parallelogram* copyShape(Parallelogram* ptr);
+Shape* copyShape(Shape* ptr);
+Polytriangle* copyShape(Polytriangle* ptr);
+
 
 
 //std::void_t = templated metafunction or type trait = evaluated at compile time
@@ -250,4 +257,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// finish shape class
+// add copy for new classes

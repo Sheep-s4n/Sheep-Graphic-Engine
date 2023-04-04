@@ -5,8 +5,19 @@
 #include "settings.h"
 
 
-int main() {
 
+float update_height = height;
+float update_width = width;
+
+
+void framebuffer_size_callback(GLFWwindow* window, int _width, int _height)
+{
+    if (scale_render_on_window_resize) glViewport(0, 0, _width, _height); // setting openGL viewport on window resize
+    update_height = _height;
+    update_width = _width;
+}
+
+int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR , 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -23,6 +34,7 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     if (glewInit() != GLEW_OK) {
         std::cout << "wth bro !" << std::endl;
     }
