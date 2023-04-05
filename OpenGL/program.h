@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <GLEW/glew.h>
-
+#include <stdarg.h>
 
 class Program;
 
@@ -88,6 +88,26 @@ public:
 		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
 		current_texture_sloat--;
 	};
+	void addFrames(int count, ...)
+	{
+		va_list args; // Define a variable argument list object
+		va_start(args, count); // Initialize the variable argument list with the last named argument
+
+		std::string* arr = new std::string[count];
+		for (int i = 0; i < count; i++) 
+		{
+			arr[i] = va_arg(args, const char*); // Retrieve the next argument from the variable argument list and store it in the array
+		}
+
+		va_end(args); // Clean up the variable argument list
+
+		// Now you can use the array 'arr' inside the function
+		for (int i = 0; i < count; i++) 
+		{
+			addFrame(arr[i]);
+		}
+		delete[] arr;
+	}
 	void addFrame(std::string image_path)
 	{
 		if (!has_frame) 

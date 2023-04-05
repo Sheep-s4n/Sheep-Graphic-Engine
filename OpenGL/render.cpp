@@ -78,12 +78,7 @@ void Program::onStartup()
     help->Y_size = 300;
     
     deja_vu = new Animator<Rectangle>(help);
-    deja_vu->addFrame("anim1.png");
-    deja_vu->addFrame("anim2.png");
-    deja_vu->addFrame("anim3.png");
-    deja_vu->addFrame("anim4.png");
-    deja_vu->addFrame("anim5.png");
-    deja_vu->addFrame("anim6.png");
+    deja_vu->addFrames(6, "anim1.png", "anim2.png", "anim3.png", "anim4.png" , "anim5.png" , "anim6.png");
 
     python_is_not_an_IDE = new Shape();
     python_is_not_an_IDE->Transform_from_middle = false;
