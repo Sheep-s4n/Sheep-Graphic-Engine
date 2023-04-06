@@ -42,15 +42,26 @@ int main() {
     Program main_program;
     main_program.onStartup();
 
+    double prev_time = glfwGetTime();
+    int frame_count = 0;
+    int fps_count = 0;
+
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
-        
+        if (glfwGetTime() > prev_time + 1)
+        {
+            fps_count = frame_count;
+            frame_count = 0;
+            prev_time = glfwGetTime();
+            std::cout << fps_count << std::endl;
+        }
         main_program.onUpdate();
         main_program.renderShapes();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+        frame_count++;
 
     }
 

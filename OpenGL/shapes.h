@@ -4,6 +4,8 @@
 #include <iostream>
 #include <type_traits>
 #include "program.h"
+#include <FreeType/ft2build.h>
+#include FT_FREETYPE_H
 #define Comment(x) /* x */
 
 extern float update_height;
@@ -257,4 +259,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// add copy for new classes
+// add text rendering with FreeType
