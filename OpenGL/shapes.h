@@ -10,6 +10,7 @@
 
 extern float update_height;
 extern float update_width;
+extern int fps;
 
 bool windowSizeChanged(int update_width, int update_height);
 
@@ -137,6 +138,23 @@ public:
 	std::vector<Triangle_Coordinates> shape_Coordinates = { 
 		{{0, 100} ,{0, 0} , { 100 ,0 }} , {{0 ,100} , {100 ,100} , {100 ,0}}
 	};
+};
+
+class Text : public Object {
+private:
+	void updateVertexBuffer();
+	int prev_X_size;
+	int prev_Y_size;
+	int prev_value;
+public:
+	void draw();
+	void setSizes(int X, int Y);
+	void setSizes(int XY);
+	void scale(int scaler);
+	Text();
+	int X_size;
+	int Y_size;
+	int value;
 };
 
 

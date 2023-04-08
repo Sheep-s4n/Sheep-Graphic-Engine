@@ -5,9 +5,10 @@
 #include "settings.h"
 
 
-
 float update_height = height;
 float update_width = width;
+int fps = 0;
+constexpr float s_interval_evalutation = 1;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int _width, int _height)
@@ -44,17 +45,15 @@ int main() {
 
     double prev_time = glfwGetTime();
     int frame_count = 0;
-    int fps_count = 0;
-
+    float interval_mul = 1 / s_interval_evalutation;
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
-        if (glfwGetTime() > prev_time + 1)
+        if (glfwGetTime() > prev_time + s_interval_evalutation)
         {
-            fps_count = frame_count;
+            fps = frame_count * interval_mul;
             frame_count = 0;
             prev_time = glfwGetTime();
-            std::cout << fps_count << std::endl;
         }
         main_program.onUpdate();
         main_program.renderShapes();

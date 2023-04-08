@@ -880,3 +880,4 @@ void Polytriangle::draw()
     if (textureColorsChanged()) updateTextureColors();
     drawFromVBO(shape_Coordinates.size() * 3);
 }
+
