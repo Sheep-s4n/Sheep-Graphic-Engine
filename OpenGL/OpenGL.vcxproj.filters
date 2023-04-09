@@ -25,6 +25,9 @@
     <Filter Include="User">
       <UniqueIdentifier>{ac309742-81f4-4a6b-a58d-0bbbabe26e5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="font">
+      <UniqueIdentifier>{17fb9b44-0b6c-49e1-add2-89cb4a424e4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -188,5 +191,10 @@
     <Text Include="..\Dependencies\ImGUI\LICENSE.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\font\arial.TTF">
+      <Filter>font</Filter>
+    </Font>
   </ItemGroup>
 </Project>

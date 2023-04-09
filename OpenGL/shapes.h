@@ -7,6 +7,7 @@
 #include <FreeType/ft2build.h>
 #include FT_FREETYPE_H
 #define Comment(x) /* x */
+#define Auto 0x0
 
 extern float update_height;
 extern float update_width;
@@ -35,7 +36,12 @@ struct Triangle_Coordinates
 	Coordinates bottom_right;
 };
 
-
+struct Character {
+	unsigned int TextureID;  // ID handle of the glyph texture
+	glm::ivec2   Size;       // Size of glyph
+	glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
+	unsigned int Advance;    // Offset to advance to next glyph
+};
 
 // extern keyword = tell compiler that the var is defined somewhere else*/
 
@@ -146,15 +152,23 @@ private:
 	int prev_X_size;
 	int prev_Y_size;
 	int prev_value;
+	FT_Face font;
+	FT_Library ft;
+	std::map<char, Character> Characters;
 public:
 	void draw();
 	void setSizes(int X, int Y);
 	void setSizes(int XY);
 	void scale(int scaler);
 	Text();
+	~Text();
 	int X_size;
 	int Y_size;
-	int value;
+	int X_text;
+	int Y_text;
+	std::string value;
+	std::string font_file;
+	std::string font_path;
 };
 
 
@@ -278,3 +292,35 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 // todo :
 // add text rendering with FreeType
+// code example :
+/*
+class MyClass
+{
+public:
+	MyClass();
+
+	int m_x;
+	int m_y;
+};
+
+MyClass::MyClass()
+{
+	m_x = 0;
+	m_y = 0;
+}
+
+int main()
+{
+	// Allocate object on heap using new operator
+	MyClass* pObj = new MyClass();
+
+	// Use object
+	pObj->m_x = 10;
+	pObj->m_y = 20;
+
+	// Free memory
+	delete pObj;
+
+	return 0;
+}
+*/

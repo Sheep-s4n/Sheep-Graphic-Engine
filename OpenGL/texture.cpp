@@ -50,7 +50,30 @@ void Texture::setTexture(const std::string path , unsigned int program_id , std:
     }
     else
         std::cout << "no data in texture buffer !!!!";
+    this->slot = slot;
+}
 
+void Texture::setTextTexture(unsigned char* texture_data, int width , int height, unsigned int program_id, std::string u_name, int slot) {
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, texture_data);
+    glGenerateTextureMipmap(texture_id);
+    int uniformLocation = glGetUniformLocation(program_id, u_name.c_str()); // integer uniform = texture slot 
+    glProgramUniform1i(program_id, uniformLocation, slot); // tell shader to get texture from ${slot}
+
+
+    this->slot = slot;
 }
 
 void Texture::bind(){

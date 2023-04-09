@@ -8,7 +8,7 @@
 float update_height = height;
 float update_width = width;
 int fps = 0;
-constexpr float s_interval_evalutation = 1;
+constexpr float s_interval_evalutation = 0.5f;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int _width, int _height)

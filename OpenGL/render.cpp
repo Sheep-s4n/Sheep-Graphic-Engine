@@ -14,6 +14,7 @@ Parallelogram* testing_this_sh__;
 Animator<Rectangle>* deja_vu;
 Shape* python_is_not_an_IDE;
 Polytriangle* hell;
+Text* fps_counter;
 
 
 void Program::onStartup()
@@ -80,8 +81,13 @@ void Program::onStartup()
     deja_vu = new Animator<Rectangle>(help);
     deja_vu->addFrames(6, "anim1.png", "anim2.png", "anim3.png", "anim4.png" , "anim5.png" , "anim6.png");
 
-    python_is_not_an_IDE = new Shape();
-    python_is_not_an_IDE->Transform_from_middle = false;
+    //python_is_not_an_IDE = new Shape();
+    //python_is_not_an_IDE->Transform_from_middle = false;
+
+    fps_counter = new Text();
+    fps_counter->value = "34";
+    fps_counter->Transform_from_middle = false;
+    fps_counter->Y = 1;
 }
 
 void Program::onUpdate()

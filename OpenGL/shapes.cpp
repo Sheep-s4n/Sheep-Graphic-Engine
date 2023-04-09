@@ -6,6 +6,7 @@
 #include "program.h"
 #define TF(x) (float)x / 100
 #define Resolve(i , size) ()
+#define MAX_ASCII 128
 
 bool windowSizeChanged(int update_width, int update_height)
 {
@@ -881,3 +882,132 @@ void Polytriangle::draw()
     drawFromVBO(shape_Coordinates.size() * 3);
 }
 
+Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello world!"), font_file("arial.ttf"), font_path("C:/Windows/Fonts") {
+
+    Program::sub_objects.push_back(this);
+    float sqr_ver_buf[] =
+    {
+      1.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.9f, 1.0f, 0.0f,
+      0.9f, 0.9f, 0.0f, 0.0f,
+      0.9f, 1.0f, 0.0f, 1.0f,
+    };
+
+
+    unsigned int sqr_ind_buf[] = // has to be unsigned
+    {
+         0,1,2,
+         2,3,0,
+    };
+
+    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    setVertexBufferLayout(0, 2, sizeof(float) * 4);
+    setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
+    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
+    setShader("F_square.shader", GL_FRAGMENT_SHADER);
+    setShader("V_square.shader", GL_VERTEX_SHADER);
+    glm::mat4 mvp = proj;
+    setUniformMatrix4fv("mvp", mvp);
+
+    prev_X = X;
+    prev_Y = Y;
+    prev_X_size = X_size;
+    prev_Y_size = Y_size;
+    prev_Texture = Texture;
+    Texture_colors = { 255 , 255 ,255 ,255 };
+
+    if (FT_Init_FreeType(&ft) == 0)
+    {
+        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &font))
+        {
+            std::cout << "couldn't find " << font_file << " in " << font_path << std::endl;
+        }
+        else 
+        {
+            FT_Set_Pixel_Sizes(font, X_text, Y_text);
+            // make texture data buffer and pass it to set Texture
+
+        }
+    }
+    else
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+    }
+
+}
+
+
+
+void Text::updateVertexBuffer()
+{
+    const int _X_size = X_size / 2;
+    const int _Y_size = Y_size / 2;
+    float X_1 = X - _X_size;
+    float Y_1 = Y - _Y_size;
+    float X_2 = X + _X_size;
+    float Y_2 = Y + _Y_size;
+
+    if (!Transform_from_middle) {
+        X_1 = X + X_size;
+        Y_1 = Y + Y_size;
+        X_2 = X;
+        Y_2 = Y;
+    }
+
+    float sqr_ver_buf[] =
+    {
+      X_2, Y_2, 1.0f, 1.0f,
+      X_2, Y_1, 1.0f, 0.0f,
+      X_1, Y_1 ,0.0f, 0.0f,
+      X_1, Y_2, 0.0f, 1.0f
+    };
+
+    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
+    prev_X = X;
+    prev_Y = Y;
+    prev_X_size = X_size;
+    prev_Y_size = Y_size;
+}
+
+
+void Text::scale(int scaler) {
+    X_size *= scaler;
+    Y_size *= scaler;
+}
+
+void Text::draw()
+{
+
+    if (
+        prev_X != X ||
+        prev_Y != Y ||
+        prev_X_size != X_size ||
+        prev_Y_size != Y_size
+        ) updateVertexBuffer();
+    if (prev_Texture != Texture) updateTexture();
+    if (colorChanged()) updateColors();
+    if (rotationChanged()) updateRotation();
+    if (textureColorsChanged()) updateTextureColors();
+    Object::draw();
+}
+
+void Text::setSizes(int X, int Y)
+{
+    X_size = X;
+    Y_size = Y;
+
+}
+
+void Text::setSizes(int XY)
+{
+    X_size = XY;
+    Y_size = XY;
+}
+
+
+
+Text::~Text()
+{
+    FT_Done_Face(font);
+    FT_Done_FreeType(ft);
+}

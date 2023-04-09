@@ -216,6 +216,9 @@
   <ItemGroup>
     <Text Include="..\Dependencies\ImGUI\LICENSE.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\font\arial.TTF" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.220531.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.220531.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
