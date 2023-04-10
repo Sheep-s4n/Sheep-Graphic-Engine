@@ -908,6 +908,7 @@ Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello w
     setShader("V_square.shader", GL_VERTEX_SHADER);
     glm::mat4 mvp = proj;
     setUniformMatrix4fv("mvp", mvp);
+    setUniform1b("has_texture", true);
 
     prev_X = X;
     prev_Y = Y;
@@ -918,15 +919,34 @@ Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello w
 
     if (FT_Init_FreeType(&ft) == 0)
     {
-        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &font))
+        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &face))
         {
-            std::cout << "couldn't find " << font_file << " in " << font_path << std::endl;
+            std::cout << "ERROR::FREETYPE: Couldn't find " << font_file << " in " << font_path << std::endl;
         }
         else 
         {
-            FT_Set_Pixel_Sizes(font, X_text, Y_text);
+            FT_Set_Pixel_Sizes(face, X_text, Y_text);
             // make texture data buffer and pass it to set Texture
+            for (unsigned char c = 0; c < MAX_ASCII; c++) {
+                // Load character glyph 
+                if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+                    std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                    continue;
+                }
 
+                tex* texture = new tex();
+                texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
+                char_textures.push_back(texture);
+
+                Character character = {
+                    texture->texture_id,
+                    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                    face->glyph->advance.x
+                };
+                Characters.insert(std::pair<char, Character>(c, character));
+
+            }
         }
     }
     else
@@ -1008,6 +1028,10 @@ void Text::setSizes(int XY)
 
 Text::~Text()
 {
-    FT_Done_Face(font);
+    FT_Done_Face(face);
     FT_Done_FreeType(ft);
+
+    for (int i = 0; i < MAX_ASCII; i++) {
+        delete char_textures[i];
+    }
 }

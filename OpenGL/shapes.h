@@ -1,5 +1,6 @@
 #pragma once
 #include "object.h"
+#include "texture.h"
 #include <string>
 #include <iostream>
 #include <type_traits>
@@ -146,14 +147,17 @@ public:
 	};
 };
 
+typedef Texture tex;
+
 class Text : public Object {
 private:
 	void updateVertexBuffer();
 	int prev_X_size;
 	int prev_Y_size;
 	int prev_value;
-	FT_Face font;
+	FT_Face face;
 	FT_Library ft;
+	std::vector<tex*> char_textures;
 	std::map<char, Character> Characters;
 public:
 	void draw();

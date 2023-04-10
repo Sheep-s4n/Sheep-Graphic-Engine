@@ -87,7 +87,7 @@ void Program::onStartup()
     fps_counter = new Text();
     fps_counter->value = "34";
     fps_counter->Transform_from_middle = false;
-    fps_counter->Y = 1;
+    fps_counter->Y = 650;
 }
 
 void Program::onUpdate()
