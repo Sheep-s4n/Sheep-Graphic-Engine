@@ -882,6 +882,8 @@ void Polytriangle::draw()
     drawFromVBO(shape_Coordinates.size() * 3);
 }
 
+std::map<std::string, std::map<char, Character>> Text::fonts; // initializating static var
+
 Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello world!"), font_file("arial.ttf"), font_path("C:/Windows/Fonts") {
 
     Program::sub_objects.push_back(this);
@@ -925,27 +927,35 @@ Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello w
         }
         else 
         {
-            FT_Set_Pixel_Sizes(face, X_text, Y_text);
-            // make texture data buffer and pass it to set Texture
-            for (unsigned char c = 0; c < MAX_ASCII; c++) {
-                // Load character glyph 
-                if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-                    std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-                    continue;
+            if (Text::fonts.count(font_file) != 0) // font already loaded
+            {
+                Characters = Text::fonts[font_file];
+            }
+            else
+            {
+                FT_Set_Pixel_Sizes(face, X_text, Y_text);
+                // make texture data buffer and pass it to set Texture
+                for (unsigned char c = 0; c < MAX_ASCII; c++) {
+                    // Load character glyph 
+                    if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+                        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                        continue;
+                    }
+
+                    tex* texture = new tex();
+                    texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
+                    char_textures.push_back(texture);
+
+                    Character character = {
+                        texture->texture_id,
+                        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                        face->glyph->advance.x
+                    };
+                    Characters.insert(std::pair<char, Character>(c, character));
+
                 }
-
-                tex* texture = new tex();
-                texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
-                char_textures.push_back(texture);
-
-                Character character = {
-                    texture->texture_id,
-                    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                    face->glyph->advance.x
-                };
-                Characters.insert(std::pair<char, Character>(c, character));
-
+                Text::fonts.emplace(font_file, Characters);
             }
         }
     }

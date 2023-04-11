@@ -85,9 +85,11 @@ void Program::onStartup()
     //python_is_not_an_IDE->Transform_from_middle = false;
 
     fps_counter = new Text();
+    fps_counter = new Text();
     fps_counter->value = "34";
     fps_counter->Transform_from_middle = false;
     fps_counter->Y = 650;
+
 }
 
 void Program::onUpdate()

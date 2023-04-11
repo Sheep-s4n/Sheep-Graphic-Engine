@@ -158,6 +158,7 @@ private:
 	FT_Face face;
 	FT_Library ft;
 	std::vector<tex*> char_textures;
+	static std::map<std::string, std::map<char, Character>> fonts;
 	std::map<char, Character> Characters;
 public:
 	void draw();
