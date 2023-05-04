@@ -6,6 +6,7 @@
 #include <memory>
 #include <GLEW/glew.h>
 #include <stdarg.h>
+#include <FreeType/freetype.h>
 
 class Program;
 
@@ -123,12 +124,39 @@ public:
 	void draw() {};
 };
 
+class Text {
+private :
+	FT_Face face;
+	FT_Library ft;
+	Shader fs = Shader("F_text.shader" , GL_FRAGMENT_SHADER);
+	Shader vs = Shader("V_text.shader" , GL_VERTEX_SHADER , fs.getProgram());
+	unsigned int VAO;
+	unsigned int VBO;
+public:
+	void draw();
+	void setSizes(int X, int Y);
+	void setSizes(int XY);
+	void scaleL(int scaler);
+	Text();
+	~Text();
+	int scale;
+	int font_size;
+	int X;
+	int Y;
+	std::string value;
+	std::string font_file;
+	std::string font_path;
+};
+
+
 class Program {
 public:
 	void renderShapes();
 	inline static std::vector<Object*> sub_objects;
+	inline static std::vector<Text*> sub_texts;
 	void onStartup();
 	void onUpdate();
 	void onFinish();
 	void clearObjects();
 };
+

@@ -14,6 +14,9 @@ void Program::renderShapes()
     for (Object* obj : Program::sub_objects) {
         obj->draw();
     }
+    for (Text* text : Program::sub_texts) {
+        text->draw();
+    }
 }
 
 
@@ -21,6 +24,10 @@ void Program::clearObjects()
 {
     for (Object* obj : Program::sub_objects) {
         delete obj;
+    };
+
+    for (Text* text : Program::sub_texts) {
+        delete text;
     }
 };
 

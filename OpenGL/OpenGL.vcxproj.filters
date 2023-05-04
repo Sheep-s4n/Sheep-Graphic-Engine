@@ -80,30 +80,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="V_shader.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="F_shader.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="F_shader2.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="V_shader2.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="F_sheep.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="V_sheep.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="F_mt.shader">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="V_mt.shader">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="F_square.shader">
       <Filter>Shader Files</Filter>
     </None>
@@ -111,6 +87,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="F_circle.shader">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="F_text.shader">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="V_text.shader">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
@@ -170,6 +152,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="program.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

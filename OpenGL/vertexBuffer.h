@@ -2,9 +2,8 @@
 #include <GLEW/glew.h>
 
 class VertexBuffer {
-private :
-	unsigned int buffer;
 public:
+	unsigned int buffer;
 	VertexBuffer();
 	~VertexBuffer();
 	void bind();

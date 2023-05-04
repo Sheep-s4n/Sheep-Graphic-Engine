@@ -4,15 +4,15 @@
 #include <string>
 #include <iostream>
 #include <type_traits>
+#include <functional>
 #include "program.h"
-#include <FreeType/ft2build.h>
-#include FT_FREETYPE_H
 #define Comment(x) /* x */
 #define Auto 0x0
 
 extern float update_height;
 extern float update_width;
 extern int fps;
+extern int frame_count;
 
 bool windowSizeChanged(int update_width, int update_height);
 
@@ -38,11 +38,12 @@ struct Triangle_Coordinates
 };
 
 struct Character {
-	unsigned int TextureID;  // ID handle of the glyph texture
+	unsigned int textureID;  // ID handle of the glyph texture
 	glm::ivec2   Size;       // Size of glyph
 	glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
 	unsigned int Advance;    // Offset to advance to next glyph
 };
+
 
 // extern keyword = tell compiler that the var is defined somewhere else*/
 
@@ -147,34 +148,10 @@ public:
 	};
 };
 
-typedef Texture tex;
 
-class Text : public Object {
-private:
-	void updateVertexBuffer();
-	int prev_X_size;
-	int prev_Y_size;
-	int prev_value;
-	FT_Face face;
-	FT_Library ft;
-	std::vector<tex*> char_textures;
-	static std::map<std::string, std::map<char, Character>> fonts;
-	std::map<char, Character> Characters;
-public:
-	void draw();
-	void setSizes(int X, int Y);
-	void setSizes(int XY);
-	void scale(int scaler);
-	Text();
-	~Text();
-	int X_size;
-	int Y_size;
-	int X_text;
-	int Y_text;
-	std::string value;
-	std::string font_file;
-	std::string font_path;
-};
+
+void runEachS(int time_inteval, const std::function<void()>& func);
+void runEachF(int frame_interval, const std::function<void()>& func);
 
 
 Circle* copyShape(Circle* ptr);
@@ -296,36 +273,49 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// add text rendering with FreeType
-// code example :
-/*
-class MyClass
-{
-public:
-	MyClass();
+Comment(
+*   if (FT_Init_FreeType(&ft) == 0)
+    {
+        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &face))
+        {
+            std::cout << "ERROR::FREETYPE: Couldn't find " << font_file << " in " << font_path << std::endl;
+        }
+        else 
+        {
+            if (Text::fonts.count(font_file) != 0) // font already loaded
+            {
+                Characters = Text::fonts[font_file];
+            }
+            else
+            {
+                FT_Set_Pixel_Sizes(face, X_text, Y_text);
+                // make texture data buffer and pass it to set Texture
+                for (unsigned char c = 0; c < MAX_ASCII; c++) {
+                    // Load character glyph 
+                    if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+                        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                        continue;
+                    }
 
-	int m_x;
-	int m_y;
-};
+                    tex* texture = new tex();
+                    texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
+                    char_textures.push_back(texture);
 
-MyClass::MyClass()
-{
-	m_x = 0;
-	m_y = 0;
-}
+                    Character character = {
+                        texture->texture_id,
+                        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                        face->glyph->advance.x
+                    };
+                    Characters.insert(std::pair<char, Character>(c, character));
 
-int main()
-{
-	// Allocate object on heap using new operator
-	MyClass* pObj = new MyClass();
-
-	// Use object
-	pObj->m_x = 10;
-	pObj->m_y = 20;
-
-	// Free memory
-	delete pObj;
-
-	return 0;
-}
-*/
+                }
+                Text::fonts.emplace(font_file, Characters);
+            }
+        }
+    }
+    else
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+    }
+)

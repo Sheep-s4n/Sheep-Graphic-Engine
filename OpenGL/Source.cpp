@@ -8,6 +8,7 @@
 float update_height = height;
 float update_width = width;
 int fps = 0;
+int frame_count = 0;
 constexpr float s_interval_evalutation = 0.5f;
 
 
@@ -44,7 +45,6 @@ int main() {
     main_program.onStartup();
 
     double prev_time = glfwGetTime();
-    int frame_count = 0;
     float interval_mul = 1 / s_interval_evalutation;
     while (!glfwWindowShouldClose(window))
     {

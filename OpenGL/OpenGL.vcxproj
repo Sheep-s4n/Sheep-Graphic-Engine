@@ -175,16 +175,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="F_circle.shader" />
-    <None Include="F_mt.shader" />
-    <None Include="F_shader.shader" />
-    <None Include="F_shader2.shader" />
-    <None Include="F_sheep.shader" />
     <None Include="F_square.shader" />
-    <None Include="V_mt.shader" />
-    <None Include="V_shader.shader" />
-    <None Include="V_shader2.shader" />
-    <None Include="V_sheep.shader" />
+    <None Include="F_text.shader" />
     <None Include="V_square.shader" />
+    <None Include="V_text.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Dependencies\ImGUI\imconfig.h" />
@@ -203,6 +197,7 @@
     <ClInclude Include="shapes.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vertexArray.h" />
     <ClInclude Include="vertexBuffer.h" />

@@ -4,9 +4,37 @@
 #include "settings.h"
 #include <algorithm>
 #include "program.h"
+#include <GLFW/glfw3.h>
+#include <cstring>
 #define TF(x) (float)x / 100
 #define Resolve(i , size) ()
 #define MAX_ASCII 128
+
+
+
+
+void runEachS(int s_time, const std::function<void()>& func)
+{
+    static double prev_time = glfwGetTime();
+    if (glfwGetTime() > prev_time + s_time)
+    {
+        func();
+        prev_time = glfwGetTime();
+    }
+};
+
+
+void runEachF(int frame_interval, const std::function<void()>& func)
+{
+    static int frames = 0;
+    if (frames >= frame_interval)
+    {
+        func();
+        frames = 0;
+    }
+    frames++;
+};
+
 
 bool windowSizeChanged(int update_width, int update_height)
 {
@@ -882,166 +910,161 @@ void Polytriangle::draw()
     drawFromVBO(shape_Coordinates.size() * 3);
 }
 
-std::map<std::string, std::map<char, Character>> Text::fonts; // initializating static var
 
-Text::Text() : X_text(Auto), Y_text(48), X_size(100), Y_size(50), value("Hello world!"), font_file("arial.ttf"), font_path("C:/Windows/Fonts") {
+//Character::Character() 
+//{
+//
+//    
+//}
+//
+//unsigned int Character::getTextureID()
+//{
+//    return char_texture.texture_id;
+//}
+//
+//void Character::bind() 
+//{
+//    char_texture.bind();
+//}
 
-    Program::sub_objects.push_back(this);
-    float sqr_ver_buf[] =
-    {
-      1.0f, 1.0f, 1.0f, 1.0f,
-      1.0f, 0.9f, 1.0f, 0.0f,
-      0.9f, 0.9f, 0.0f, 0.0f,
-      0.9f, 1.0f, 0.0f, 1.0f,
-    };
+std::map<char, Character> Characters;
 
 
-    unsigned int sqr_ind_buf[] = // has to be unsigned
-    {
-         0,1,2,
-         2,3,0,
-    };
+Text::Text() : X(0) , Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
+{
+    Program::sub_texts.push_back(this);
 
-    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
-    setVertexBufferLayout(0, 2, sizeof(float) * 4);
-    setVertexBufferLayout(1, 2, sizeof(float) * 4, sizeof(float) * 2);
-    setDynamicIndexBuffer(sqr_ind_buf, 6 * sizeof(unsigned int));
-    setShader("F_square.shader", GL_FRAGMENT_SHADER);
-    setShader("V_square.shader", GL_VERTEX_SHADER);
-    glm::mat4 mvp = proj;
-    setUniformMatrix4fv("mvp", mvp);
-    setUniform1b("has_texture", true);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
-    prev_X = X;
-    prev_Y = Y;
-    prev_X_size = X_size;
-    prev_Y_size = Y_size;
-    prev_Texture = Texture;
-    Texture_colors = { 255 , 255 ,255 ,255 };
-
-    if (FT_Init_FreeType(&ft) == 0)
-    {
-        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &face))
-        {
-            std::cout << "ERROR::FREETYPE: Couldn't find " << font_file << " in " << font_path << std::endl;
-        }
-        else 
-        {
-            if (Text::fonts.count(font_file) != 0) // font already loaded
-            {
-                Characters = Text::fonts[font_file];
-            }
-            else
-            {
-                FT_Set_Pixel_Sizes(face, X_text, Y_text);
-                // make texture data buffer and pass it to set Texture
-                for (unsigned char c = 0; c < MAX_ASCII; c++) {
-                    // Load character glyph 
-                    if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-                        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-                        continue;
-                    }
-
-                    tex* texture = new tex();
-                    texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
-                    char_textures.push_back(texture);
-
-                    Character character = {
-                        texture->texture_id,
-                        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                        face->glyph->advance.x
-                    };
-                    Characters.insert(std::pair<char, Character>(c, character));
-
-                }
-                Text::fonts.emplace(font_file, Characters);
-            }
-        }
-    }
-    else
+    ft = FT_Library();
+    if (FT_Init_FreeType(&ft))
     {
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
     }
 
-}
-
-
-
-void Text::updateVertexBuffer()
-{
-    const int _X_size = X_size / 2;
-    const int _Y_size = Y_size / 2;
-    float X_1 = X - _X_size;
-    float Y_1 = Y - _Y_size;
-    float X_2 = X + _X_size;
-    float Y_2 = Y + _Y_size;
-
-    if (!Transform_from_middle) {
-        X_1 = X + X_size;
-        Y_1 = Y + Y_size;
-        X_2 = X;
-        Y_2 = Y;
+    face = FT_Face();
+    if (FT_New_Face(ft, std::string(font_path +"/"+ font_file).c_str(), 0, &face))
+    {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
     }
 
-    float sqr_ver_buf[] =
+    int divide = 10;
+    FT_Set_Pixel_Sizes(face, 0, (height + width) / divide);
+
+    if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
     {
-      X_2, Y_2, 1.0f, 1.0f,
-      X_2, Y_1, 1.0f, 0.0f,
-      X_1, Y_1 ,0.0f, 0.0f,
-      X_1, Y_2, 0.0f, 1.0f
-    };
+        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+    }
 
-    setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
-    prev_X = X;
-    prev_Y = Y;
-    prev_X_size = X_size;
-    prev_Y_size = Y_size;
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
+
+
+    for (unsigned char c = 0; c < 128; c++)
+    {
+        // load character glyph 
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+        {
+            std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+            continue;
+        }
+        // generate texture
+        unsigned int texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RED,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer
+        );
+        // set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // now store character for later use
+        Character character = {
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x
+        };
+        Characters.insert(std::pair<char, Character>(c, character));
+    }
+
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glm::mat4 projection = glm::ortho(0.0f, width, 0.0f, height);
+    glUniformMatrix4fv(glGetUniformLocation(fs.getProgram(), "projection"), 1, GL_FALSE, &projection[0][0]);
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
-
-void Text::scale(int scaler) {
-    X_size *= scaler;
-    Y_size *= scaler;
-}
-
-void Text::draw()
+void Text::draw() 
 {
 
-    if (
-        prev_X != X ||
-        prev_Y != Y ||
-        prev_X_size != X_size ||
-        prev_Y_size != Y_size
-        ) updateVertexBuffer();
-    if (prev_Texture != Texture) updateTexture();
-    if (colorChanged()) updateColors();
-    if (rotationChanged()) updateRotation();
-    if (textureColorsChanged()) updateTextureColors();
-    Object::draw();
+    int x = X;
+    // activate corresponding render state	
+    fs.bindProgram(); //s.Use();
+    glUniform3f(glGetUniformLocation(fs.getProgram(), "textColor"), 0.5f, 0.5f, 0.5f);
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(VAO);
+
+    // iterate through all characters
+    std::string::const_iterator c;
+    for (c = value.begin(); c != value.end(); c++)
+    {
+        Character ch = Characters[*c];
+
+        float xpos = x + ch.Bearing.x * scale;
+        float ypos = Y - (ch.Size.y - ch.Bearing.y) * scale;
+
+        float w = ch.Size.x * scale;
+        float h = ch.Size.y * scale;
+        // update VBO for each character
+        float vertices[6][4] = {
+            { xpos,     ypos + h,   0.0f, 0.0f },
+            { xpos,     ypos,       0.0f, 1.0f },
+            { xpos + w, ypos,       1.0f, 1.0f },
+
+            { xpos,     ypos + h,   0.0f, 0.0f },
+            { xpos + w, ypos,       1.0f, 1.0f },
+            { xpos + w, ypos + h,   1.0f, 0.0f }
+        };
+        // render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.textureID);
+        // update content of VBO memory
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // render quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+    }
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-void Text::setSizes(int X, int Y)
-{
-    X_size = X;
-    Y_size = Y;
-
-}
-
-void Text::setSizes(int XY)
-{
-    X_size = XY;
-    Y_size = XY;
-}
-
-
 
 Text::~Text()
 {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
-
-    for (int i = 0; i < MAX_ASCII; i++) {
-        delete char_textures[i];
-    }
-}
+};

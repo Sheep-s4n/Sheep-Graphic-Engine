@@ -16,7 +16,6 @@ Shape* python_is_not_an_IDE;
 Polytriangle* hell;
 Text* fps_counter;
 
-
 void Program::onStartup()
 {
 
@@ -85,10 +84,11 @@ void Program::onStartup()
     //python_is_not_an_IDE->Transform_from_middle = false;
 
     fps_counter = new Text();
-    fps_counter = new Text();
-    fps_counter->value = "34";
-    fps_counter->Transform_from_middle = false;
-    fps_counter->Y = 650;
+    fps_counter->Y = 400;
+    //fps_counter = new Text();
+    //fps_counter->value = "34";
+    //fps_counter->Transform_from_middle = false;
+    //fps_counter->Y = 650;
 
 }
 
@@ -99,6 +99,7 @@ void Program::onUpdate()
     a_square->X_size += 3;
     if (a_square->X_size > width) a_square->X_size = 0;
     deja_vu->nextFrame(40); 
+    fps_counter->value = std::to_string(fps);
 }
 
 void Program::onFinish()

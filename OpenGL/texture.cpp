@@ -53,7 +53,7 @@ void Texture::setTexture(const std::string path , unsigned int program_id , std:
 
 }
 
-void Texture::setTextTexture(unsigned char* texture_data, int width , int height , int slot) {
+void Texture::setTextTexture(unsigned char* texture_data, int width, int height, int slot) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -68,9 +68,9 @@ void Texture::setTextTexture(unsigned char* texture_data, int width , int height
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, texture_data);
-  //  glGenerateTextureMipmap(texture_id);
-    //int uniformLocation = glGetUniformLocation(program_id, u_name.c_str()); // integer uniform = texture slot 
-    //glProgramUniform1i(program_id, uniformLocation, slot); // tell shader to get texture from ${slot}
+    //  glGenerateTextureMipmap(texture_id);
+      //int uniformLocation = glGetUniformLocation(program_id, u_name.c_str()); // integer uniform = texture slot 
+      //glProgramUniform1i(program_id, uniformLocation, slot); // tell shader to get texture from ${slot}
 
 
     this->slot = slot;
