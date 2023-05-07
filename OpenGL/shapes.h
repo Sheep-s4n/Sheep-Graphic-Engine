@@ -148,7 +148,29 @@ public:
 	};
 };
 
-
+class Text : public Object {
+private:
+	FT_Face face;
+	FT_Library ft;
+	Shader fs = Shader("F_text.shader", GL_FRAGMENT_SHADER);
+	Shader vs = Shader("V_text.shader", GL_VERTEX_SHADER, fs.getProgram());
+	unsigned int VAO;
+	unsigned int VBO;
+	int font_texture_size;
+	float scale;
+public:
+	void draw();
+	void setSizes(int X, int Y);
+	void setSizes(int XY);
+	void scaleL(int scaler);
+	Text();
+	Text(int render_size);
+	~Text();
+	int font_size;
+	std::string value;
+	std::string font_file;
+	std::string font_path;
+};
 
 void runEachS(int time_inteval, const std::function<void()>& func);
 void runEachF(int frame_interval, const std::function<void()>& func);
@@ -273,49 +295,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-Comment(
-*   if (FT_Init_FreeType(&ft) == 0)
-    {
-        if (FT_New_Face(ft, (font_path+"/"+font_file).c_str(), 0, &face))
-        {
-            std::cout << "ERROR::FREETYPE: Couldn't find " << font_file << " in " << font_path << std::endl;
-        }
-        else 
-        {
-            if (Text::fonts.count(font_file) != 0) // font already loaded
-            {
-                Characters = Text::fonts[font_file];
-            }
-            else
-            {
-                FT_Set_Pixel_Sizes(face, X_text, Y_text);
-                // make texture data buffer and pass it to set Texture
-                for (unsigned char c = 0; c < MAX_ASCII; c++) {
-                    // Load character glyph 
-                    if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-                        std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-                        continue;
-                    }
-
-                    tex* texture = new tex();
-                    texture->setTextTexture(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
-                    char_textures.push_back(texture);
-
-                    Character character = {
-                        texture->texture_id,
-                        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                        face->glyph->advance.x
-                    };
-                    Characters.insert(std::pair<char, Character>(c, character));
-
-                }
-                Text::fonts.emplace(font_file, Characters);
-            }
-        }
-    }
-    else
-    {
-        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-    }
-)
+// nextFrame based on time for Animator

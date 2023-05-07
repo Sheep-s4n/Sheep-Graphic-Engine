@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <GLEW/glew.h>
+#include <GLFW/glfw3.h>
 #include <stdarg.h>
 #include <FreeType/freetype.h>
 
@@ -24,9 +25,11 @@ private:
 	int next_texture_sloat_available;
 	int current_texture_sloat;
 	int frame_count;
+	double time;
+
 	bool has_frame = false;
 public:
-	Animator(T* _shape) : shape(_shape), frame_count(99999), next_texture_sloat_available(0), current_texture_sloat(0)
+	Animator(T* _shape) : time(glfwGetTime()) , shape(_shape), frame_count(99999), next_texture_sloat_available(0), current_texture_sloat(0)
 	{
 		Program::sub_objects.push_back(this);
 		shape->Texture = "";
@@ -39,12 +42,27 @@ public:
 	{
 		shape = _shape;
 	};
-	void nextFrame(int switch_interval)
+	void nextFrameF(int switch_interval)
 	{
 		if (shape->Texture != "") return; // not changing if the shape has already a texture
 		frame_count++;
 		if (frame_count <= switch_interval) return;
 		frame_count = 0;
+		if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
+		int max_it = 32;
+		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].sloat == -1) {
+			current_texture_sloat++;
+			if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
+			if (--max_it < 1) return;
+		}
+		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
+		current_texture_sloat++;
+	};
+	void nextFrameS(float switch_interval)
+	{
+		if (shape->Texture != "") return; // not changing if the shape has already a texture
+		if (glfwGetTime() <= time + switch_interval) return;
+		time = glfwGetTime();
 		if (current_texture_sloat > myMap.size() - 1) current_texture_sloat = 0;
 		int max_it = 32;
 		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].sloat == -1) {
@@ -74,12 +92,26 @@ public:
 	{
 		myMap[_sloat].sloat = _sloat;
 	}
-	void nextFrameReverseOrder(int switch_interval)
+	void nextFrameReverseOrderF(int switch_interval)
 	{
 		if (shape->Texture != "") return;
 		frame_count++;
 		if (frame_count <= switch_interval) return;
 		frame_count = 0;
+		if (current_texture_sloat < 0) current_texture_sloat = myMap.size() - 1;
+		int max_it = 32;
+		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].image_path == "") {
+			current_texture_sloat--;
+			if (++max_it < 1) break;
+		}
+		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
+		current_texture_sloat--;
+	};
+	void nextFrameReverseOrderS(float switch_interval)
+	{
+		if (shape->Texture != "") return; // not changing if the shape has already a texture
+		if (glfwGetTime() <= time + switch_interval) return;
+		time = glfwGetTime();
 		if (current_texture_sloat < 0) current_texture_sloat = myMap.size() - 1;
 		int max_it = 32;
 		while (myMap.count(current_texture_sloat) < 1 || myMap[current_texture_sloat].image_path == "") {
@@ -124,36 +156,11 @@ public:
 	void draw() {};
 };
 
-class Text {
-private :
-	FT_Face face;
-	FT_Library ft;
-	Shader fs = Shader("F_text.shader" , GL_FRAGMENT_SHADER);
-	Shader vs = Shader("V_text.shader" , GL_VERTEX_SHADER , fs.getProgram());
-	unsigned int VAO;
-	unsigned int VBO;
-public:
-	void draw();
-	void setSizes(int X, int Y);
-	void setSizes(int XY);
-	void scaleL(int scaler);
-	Text();
-	~Text();
-	int scale;
-	int font_size;
-	int X;
-	int Y;
-	std::string value;
-	std::string font_file;
-	std::string font_path;
-};
-
 
 class Program {
 public:
 	void renderShapes();
 	inline static std::vector<Object*> sub_objects;
-	inline static std::vector<Text*> sub_texts;
 	void onStartup();
 	void onUpdate();
 	void onFinish();

@@ -3,7 +3,6 @@
 #include <vector>
 #include "settings.h"
 #include <algorithm>
-#include "program.h"
 #include <GLFW/glfw3.h>
 #include <cstring>
 #define TF(x) (float)x / 100
@@ -911,28 +910,16 @@ void Polytriangle::draw()
 }
 
 
-//Character::Character() 
-//{
-//
-//    
-//}
-//
-//unsigned int Character::getTextureID()
-//{
-//    return char_texture.texture_id;
-//}
-//
-//void Character::bind() 
-//{
-//    char_texture.bind();
-//}
-
 std::map<char, Character> Characters;
 
+//Text::Text(int render_size) : X(0), Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(render_size)
+//{
+//    Text::Text();
+//}
 
-Text::Text() : X(0) , Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
+Text::Text() : scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
 {
-    Program::sub_texts.push_back(this);
+    Program::sub_objects.push_back(this);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
@@ -949,7 +936,8 @@ Text::Text() : X(0) , Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Wind
     }
 
     int divide = 10;
-    FT_Set_Pixel_Sizes(face, 0, (height + width) / divide);
+    font_texture_size = (height + width) / divide;
+    FT_Set_Pixel_Sizes(face, 0, font_texture_size);
 
     if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
     {
@@ -959,8 +947,9 @@ Text::Text() : X(0) , Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Wind
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
 
-    for (unsigned char c = 0; c < 128; c++)
+    for (unsigned char c = 0; c < MAX_ASCII; c++)
     {
+        if (Characters.count(c) > 0) break;
         // load character glyph 
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
@@ -1001,7 +990,7 @@ Text::Text() : X(0) , Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Wind
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glm::mat4 projection = glm::ortho(0.0f, width, 0.0f, height);
+    glm::mat4 projection = proj;
     glUniformMatrix4fv(glGetUniformLocation(fs.getProgram(), "projection"), 1, GL_FALSE, &projection[0][0]);
 
     glGenVertexArrays(1, &VAO);
@@ -1021,12 +1010,25 @@ void Text::draw()
     int x = X;
     // activate corresponding render state	
     fs.bindProgram(); //s.Use();
-    glUniform3f(glGetUniformLocation(fs.getProgram(), "textColor"), 0.5f, 0.5f, 0.5f);
+    glUniform4f(glGetUniformLocation(fs.getProgram(), "textColor"), (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
-
-    // iterate through all characters
+            // make 140px = 1px                 // adding font size
+    scale = (1.0f / (float)font_texture_size) + ((float)font_size / (float)font_texture_size);
     std::string::const_iterator c;
+    
+    int total_width = 0;
+    int total_height = 0;
+    for (c = value.begin(); c != value.end(); c++) {
+
+        Character ch = Characters[*c];
+        if ((ch.Size.y * scale) > total_height)total_height = ch.Size.y * scale;
+        total_width += ((ch.Advance >> 6) * scale);
+    }
+    float mid_w = total_width / 2;
+    float mid_h = total_height / 2;
+
+
     for (c = value.begin(); c != value.end(); c++)
     {
         Character ch = Characters[*c];
@@ -1037,15 +1039,52 @@ void Text::draw()
         float w = ch.Size.x * scale;
         float h = ch.Size.y * scale;
         // update VBO for each character
-        float vertices[6][4] = {
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos,     ypos,       0.0f, 1.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
 
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
-            { xpos + w, ypos + h,   1.0f, 0.0f }
+
+        float vertices[6][4] = {
+            { xpos,     ypos + h,   0.0f, 0.0f }, // haut gauche
+            { xpos,     ypos,       0.0f, 1.0f }, // bas gauche
+            { xpos + w, ypos,       1.0f, 1.0f }, // bas droite
+
+            { xpos,     ypos + h,   0.0f, 0.0f }, // haut gauche
+            { xpos + w, ypos,       1.0f, 1.0f }, // bas droite
+            { xpos + w, ypos + h,   1.0f, 0.0f } // 
         };
+
+
+
+        if (Transform_from_middle) 
+        {
+            vertices[0][0] = xpos - mid_w;
+            vertices[0][1] = (ypos + h) - mid_h;
+            vertices[0][2] = 0.0f;
+            vertices[0][3] = 0.0f;
+        
+            vertices[1][0] = xpos - mid_w;
+            vertices[1][1] = ypos - mid_h;
+            vertices[1][2] = 0.0f;
+            vertices[1][3] = 1.0f;
+        
+            vertices[2][0] = (xpos + w) - mid_w;
+            vertices[2][1] = ypos - mid_h;
+            vertices[2][2] = 1.0f;
+            vertices[2][3] = 1.0f;
+        
+            vertices[3][0] = xpos - mid_w;
+            vertices[3][1] = (ypos + h) - mid_h;
+            vertices[3][2] = 0.0f;
+            vertices[3][3] = 0.0f;
+        
+            vertices[4][0] = (xpos + w) - mid_w;
+            vertices[4][1] = (ypos) - mid_h;
+            vertices[4][2] = 1.0f;
+            vertices[4][3] = 1.0f;
+        
+            vertices[5][0] = (xpos + w) - mid_w;
+            vertices[5][1] = (ypos + h) - mid_h;
+            vertices[5][2] = 1.0f;
+            vertices[5][3] = 0.0f;
+        }
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.textureID);
         // update content of VBO memory
@@ -1068,3 +1107,4 @@ Text::~Text()
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
 };
+
