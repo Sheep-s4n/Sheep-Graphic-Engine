@@ -154,15 +154,14 @@ private:
 	FT_Library ft;
 	Shader fs = Shader("F_text.shader", GL_FRAGMENT_SHADER);
 	Shader vs = Shader("V_text.shader", GL_VERTEX_SHADER, fs.getProgram());
+	std::map<char, Character> Characters;
 	unsigned int VAO;
 	unsigned int VBO;
 	int font_texture_size;
-	float scale;
+	float Scale;
 public:
 	void draw();
-	void setSizes(int X, int Y);
-	void setSizes(int XY);
-	void scaleL(int scaler);
+	void scale(int scaler);
 	Text();
 	Text(int render_size);
 	~Text();

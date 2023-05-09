@@ -910,19 +910,15 @@ void Polytriangle::draw()
 }
 
 
-std::map<char, Character> Characters;
 
-//Text::Text(int render_size) : X(0), Y(0), scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(render_size)
-//{
-//    Text::Text();
-//}
 
-Text::Text() : scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
+Text::Text(int render_size) : Scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
 {
     Program::sub_objects.push_back(this);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
+    
     ft = FT_Library();
     if (FT_Init_FreeType(&ft))
     {
@@ -937,6 +933,7 @@ Text::Text() : scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), 
 
     int divide = 10;
     font_texture_size = (height + width) / divide;
+    if (render_size != -1) font_texture_size = render_size;
     FT_Set_Pixel_Sizes(face, 0, font_texture_size);
 
     if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
@@ -949,7 +946,6 @@ Text::Text() : scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), 
 
     for (unsigned char c = 0; c < MAX_ASCII; c++)
     {
-        if (Characters.count(c) > 0) break;
         // load character glyph 
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
@@ -1004,6 +1000,8 @@ Text::Text() : scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), 
     glBindVertexArray(0);
 }
 
+Text::Text() : Text(-1) {} //calling the other constructor !
+
 void Text::draw() 
 {
 
@@ -1014,7 +1012,7 @@ void Text::draw()
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
             // make 140px = 1px                 // adding font size
-    scale = (1.0f / (float)font_texture_size) + ((float)font_size / (float)font_texture_size);
+    Scale = (1.0f / (float)font_texture_size) + ((float)font_size / (float)font_texture_size);
     std::string::const_iterator c;
     
     int total_width = 0;
@@ -1022,8 +1020,8 @@ void Text::draw()
     for (c = value.begin(); c != value.end(); c++) {
 
         Character ch = Characters[*c];
-        if ((ch.Size.y * scale) > total_height)total_height = ch.Size.y * scale;
-        total_width += ((ch.Advance >> 6) * scale);
+        if ((ch.Size.y * Scale) > total_height)total_height = ch.Size.y * Scale;
+        total_width += ((ch.Advance >> 6) * Scale);
     }
     float mid_w = total_width / 2;
     float mid_h = total_height / 2;
@@ -1033,11 +1031,11 @@ void Text::draw()
     {
         Character ch = Characters[*c];
 
-        float xpos = x + ch.Bearing.x * scale;
-        float ypos = Y - (ch.Size.y - ch.Bearing.y) * scale;
+        float xpos = x + ch.Bearing.x * Scale;
+        float ypos = Y - (ch.Size.y - ch.Bearing.y) * Scale;
 
-        float w = ch.Size.x * scale;
-        float h = ch.Size.y * scale;
+        float w = ch.Size.x * Scale;
+        float h = ch.Size.y * Scale;
         // update VBO for each character
 
 
@@ -1094,11 +1092,16 @@ void Text::draw()
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        x += (ch.Advance >> 6) * Scale; // bitshift by 6 to get value in pixels (2^6 = 64)
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void Text::scale(int scaler) {
+    font_size *= scaler;
+}
+
 
 Text::~Text()
 {

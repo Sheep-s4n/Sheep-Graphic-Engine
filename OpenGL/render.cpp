@@ -85,7 +85,7 @@ void Program::onStartup()
     //python_is_not_an_IDE = new Shape();
     //python_is_not_an_IDE->Transform_from_middle = false;
 
-    fps_counter = new Text();
+    fps_counter = new Text(20);
     fps_counter->font_size = 15;
     fps_counter->setPositions(0,height - fps_counter->font_size);
     fps_counter->setColors(220, 220, 220);
