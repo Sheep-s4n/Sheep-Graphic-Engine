@@ -15,6 +15,7 @@ Animator<Rectangle>* deja_vu;
 Shape* python_is_not_an_IDE;
 Polytriangle* hell;
 Text* fps_counter;
+Text* fps_counter_copy;
 Text* text;
 
 
@@ -91,6 +92,7 @@ void Program::onStartup()
     fps_counter->setColors(220, 220, 220);
     fps_counter->value = "fps: ...";
     fps_counter->Transform_from_middle = false;
+    fps_counter->Texture = "anim1.png";
 
     text = new Text();
     text->Transform_from_middle = false;

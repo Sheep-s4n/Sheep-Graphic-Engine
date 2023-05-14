@@ -50,7 +50,7 @@ bool windowSizeChanged(int update_width, int update_height)
 }
 
 template<class T>
-T* copyBasicPropreties(T* shape){
+T* copyBasicPropreties(T* shape, int arg = -1){
     T* new_shape = new T();
     new_shape->R = shape->R;
     new_shape->G = shape->G;
@@ -121,6 +121,29 @@ Polytriangle* copyShape(Polytriangle* ptr)
     new_polytriangle->Size = ptr->Size;
     new_polytriangle->shape_Coordinates = ptr->shape_Coordinates;
     return new_polytriangle;
+}
+
+Text* copyShape(Text* ptr)
+{
+    Text* new_text = new Text(ptr->render_size);
+    new_text->R = ptr->R;
+    new_text->G = ptr->G;
+    new_text->B = ptr->B;
+    new_text->A = ptr->A;
+    new_text->X = ptr->X;
+    new_text->Y = ptr->Y;
+    new_text->X_rotate = ptr->X_rotate;
+    new_text->Y_rotate = ptr->Y_rotate;
+    new_text->Z_rotate = ptr->Z_rotate;
+    new_text->Texture = ptr->Texture;
+    new_text->Texture_colors = ptr->Texture_colors;
+    // custom propreties:
+    new_text->Transform_from_middle = ptr->Transform_from_middle;
+    new_text->font_size = ptr->font_size;
+    new_text->font_path = ptr->font_path;
+    new_text->font_file = ptr->font_size;
+    new_text->value = ptr->value;
+    return new_text;
 }
 
 
@@ -912,12 +935,12 @@ void Polytriangle::draw()
 
 
 
-Text::Text(int render_size) : Scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
+Text::Text(int _render_size) : render_size(_render_size), Scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
 {
+    program_id = fs.getProgram();
     Program::sub_objects.push_back(this);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-
     
     ft = FT_Library();
     if (FT_Init_FreeType(&ft))
@@ -1004,10 +1027,45 @@ Text::Text() : Text(-1) {} //calling the other constructor !
 
 void Text::draw() 
 {
+    fs.bindProgram(); //s.Use(); 
+
+    //if (rotationChanged()) 
+    //{
+    //    glm::mat4 mvp =
+    //        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
+    //        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
+    //        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
+    //        * proj;
+    //
+    //    glProgramUniformMatrix4fv(
+    //        fs.getProgram(),
+    //        glGetUniformLocation(fs.getProgram(), "projection"),
+    //        1, GL_FALSE,
+    //        &mvp[0][0]
+    //    );
+    //
+    //    prev_rotation[0] = X_rotate;
+    //    prev_rotation[1] = Y_rotate;
+    //    prev_rotation[2] = Z_rotate;
+    //};
+    if (prev_Texture != Texture) 
+    {
+        if (Texture == "")
+        {
+            setUniform1b("has_texture", false);
+        }
+        else
+        {
+            setUniform1b("has_texture", true);
+            setTexture(Texture, "c_texture", true , 1);
+        }
+        prev_Texture = Texture;
+    };
+    if (textureColorsChanged()) updateTextureColors();
+
 
     int x = X;
     // activate corresponding render state	
-    fs.bindProgram(); //s.Use();
     glUniform4f(glGetUniformLocation(fs.getProgram(), "textColor"), (float)R / 255, (float)G / 255, (float)B / 255, (float)A / 255);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
@@ -1084,7 +1142,13 @@ void Text::draw()
             vertices[5][3] = 0.0f;
         }
         // render glyph texture over quad
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ch.textureID);
+        if (Texture != "")
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, texture.texture_id);
+        }
         // update content of VBO memory
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

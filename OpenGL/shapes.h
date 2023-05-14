@@ -166,6 +166,7 @@ public:
 	Text(int render_size);
 	~Text();
 	int font_size;
+	const int render_size;
 	std::string value;
 	std::string font_file;
 	std::string font_path;
@@ -182,6 +183,7 @@ Triangle* copyShape(Triangle* ptr);
 Parallelogram* copyShape(Parallelogram* ptr);
 Shape* copyShape(Shape* ptr);
 Polytriangle* copyShape(Polytriangle* ptr);
+Text* copyShape(Text* ptr);
 
 
 
@@ -230,24 +232,32 @@ void copyShapePropreties(T1* shape, T2* target_shape) {
 	target_shape->Texture_colors = shape->Texture_colors;
 	target_shape->Transform_from_middle = shape->Transform_from_middle;
 
-	// evaluate expression at compile-time using so it only keeps the correct piece of code
-	if constexpr (has_Size<T1>::value && has_Size<T2>::value)
+
+	if constexpr (std::is_same<T1 , Text>::value || std::is_same<T2, Text>::value)
 	{
-		target_shape->Size = shape->Size;
-	}
-	else if constexpr (has_Size<T1>::value)
-	{
-		target_shape->X_size = shape->Size;
-		target_shape->Y_size = shape->Size;
-	}
-	else if constexpr (has_Size<T2>::value)
-	{
-		target_shape->Size = shape->X_size;
+		std::cout << "not implemented for text" << std::endl;
 	}
 	else 
 	{
-		target_shape->X_size = shape->X_size;
-		target_shape->Y_size = shape->Y_size;
+		// evaluate expression at compile-time using so it only keeps the correct piece of code
+		if constexpr (has_Size<T1>::value && has_Size<T2>::value)
+		{
+			target_shape->Size = shape->Size;
+		}
+		else if constexpr (has_Size<T1>::value)
+		{
+			target_shape->X_size = shape->Size;
+			target_shape->Y_size = shape->Size;
+		}
+		else if constexpr (has_Size<T2>::value)
+		{
+			target_shape->Size = shape->X_size;
+		}
+		else 
+		{
+			target_shape->X_size = shape->X_size;
+			target_shape->Y_size = shape->Y_size;
+		}
 	}
 
 }
@@ -272,26 +282,34 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 	target_shape->Z_rotate = shape->Z_rotate;
 	target_shape->Transform_from_middle = shape->Transform_from_middle;
 
-	if constexpr (has_Size<T1>::value && has_Size<T2>::value)
+	if constexpr (std::is_same<T1, Text>::value || std::is_same<T2, Text>::value)
 	{
-		target_shape->Size = shape->Size;
-	}
-	else if constexpr (has_Size<T1>::value)
-	{
-		target_shape->X_size = shape->Size;
-		target_shape->Y_size = shape->Size;
-	}
-	else if constexpr (has_Size<T2>::value)
-	{
-		target_shape->Size = shape->X_size;
+		std::cout << "not implemented for text" << std::endl;
 	}
 	else
 	{
-		target_shape->X_size = shape->X_size;
-		target_shape->Y_size = shape->Y_size;
+		// evaluate expression at compile-time using so it only keeps the correct piece of code
+		if constexpr (has_Size<T1>::value && has_Size<T2>::value)
+		{
+			target_shape->Size = shape->Size;
+		}
+		else if constexpr (has_Size<T1>::value)
+		{
+			target_shape->X_size = shape->Size;
+			target_shape->Y_size = shape->Size;
+		}
+		else if constexpr (has_Size<T2>::value)
+		{
+			target_shape->Size = shape->X_size;
+		}
+		else
+		{
+			target_shape->X_size = shape->X_size;
+			target_shape->Y_size = shape->Y_size;
+		}
 	}
 };
 
 
 // todo :
-// nextFrame based on time for Animator
+// position with template function |ex: PositionTopLeft<Object>(var)|
