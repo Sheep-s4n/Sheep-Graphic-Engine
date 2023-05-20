@@ -2,7 +2,7 @@
 
 ## Usage:
 
-All code needs to be in the **render.cpp** file.
+All code needs to be in the **render.cpp** file.<br>
 **render.cpp:**
 ```
 #include "program.h"
@@ -23,20 +23,26 @@ void Program::onFinish()
     // after render
 } 
 ```
-1. First you have to initialize the shapes as a pointer outside the methods so that it can be accessed by all the methods afterwards.
+1. First you have to initialize the shapes as a pointer outside the methods so that it can be accessed by all the methods afterwards.<br>
 For example for a square : 
-`` Square* my_sqr; ``
+``` 
+Square* my_sqr; 
+```
 2. Then you have to call the constructor of the shape in ``void Program::onStartup()`` and change the properties that will not be changed anymore.
 ```
 my_sqr = new Square();
 my_sqr->setColors(50); // or (*my_sqr).setColors(50);
 ```
 3. Now you can change a property of a shape each rendered frame in ``void Program::onUpdate()``
-`` my_sqr->X += 1; // the square will move forward ``
+``` 
+my_sqr->X += 1; // the square will move forward 
+```
 4. Finally you can run code at the end of the rendering in `` void Program::onFinish() `` (you don't need to free the memory allocated in the heap by the ``new`` keyword, the graphic engine contains a garbage collector)
-`` std::cout << "Successfully rendered a square !" << std::endl; ``
+``` 
+std::cout << "Successfully rendered a square !" << std::endl; 
+```
 
-Settings are located in **settings.h** file, they can be read from **render.cpp** 
+Settings are located in **settings.h** file, they can be read from **render.cpp**.<br>
 **settings.h:**
 ```
 #pragma once
