@@ -67,6 +67,20 @@ T* copyBasicPropreties(T* shape, int arg = -1){
     return new_shape;
 };
 
+template<class T1>
+void PositionMiddle(T1* shape)
+{
+    shape->Transform_from_middle = true;
+    shape->setPositions(width / 2, height / 2);
+}
+
+template void PositionMiddle(Polytriangle*);
+template void PositionMiddle(Circle*);
+template void PositionMiddle(Rectangle*);
+template void PositionMiddle(Square*);
+template void PositionMiddle(Triangle*);
+template void PositionMiddle(Parallelogram*);
+template void PositionMiddle(Shape*);
 
 Circle* copyShape(Circle* ptr)
 {
@@ -125,7 +139,7 @@ Polytriangle* copyShape(Polytriangle* ptr)
 
 Text* copyShape(Text* ptr)
 {
-    Text* new_text = new Text(ptr->render_size);
+    Text* new_text = new Text(ptr->Render_size);
     new_text->R = ptr->R;
     new_text->G = ptr->G;
     new_text->B = ptr->B;
@@ -139,10 +153,10 @@ Text* copyShape(Text* ptr)
     new_text->Texture_colors = ptr->Texture_colors;
     // custom propreties:
     new_text->Transform_from_middle = ptr->Transform_from_middle;
-    new_text->font_size = ptr->font_size;
-    new_text->font_path = ptr->font_path;
-    new_text->font_file = ptr->font_size;
-    new_text->value = ptr->value;
+    new_text->Font_size = ptr->Font_size;
+    new_text->Font_path = ptr->Font_path;
+    new_text->Font_file = ptr->Font_size;
+    new_text->Value = ptr->Value;
     return new_text;
 }
 
@@ -935,10 +949,13 @@ void Polytriangle::draw()
 
 
 
-Text::Text(int _render_size) : render_size(_render_size), Scale(1), font_file("arial.ttf"), font_path("C:/Windows/Fonts"), value("Hello, World!"), font_size(48)
+Text::Text(int _Render_size) : Texture_repeat(2), Render_size(_Render_size), Scale(1), Font_file("arial.ttf"), Font_path("C:/Windows/Fonts"), Value("Hello, World!"), Font_size(48)
 {
     program_id = fs.getProgram();
     Program::sub_objects.push_back(this);
+
+    Texture_colors = { 255 , 255 ,255 ,255 };
+
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
     
@@ -949,14 +966,14 @@ Text::Text(int _render_size) : render_size(_render_size), Scale(1), font_file("a
     }
 
     face = FT_Face();
-    if (FT_New_Face(ft, std::string(font_path +"/"+ font_file).c_str(), 0, &face))
+    if (FT_New_Face(ft, std::string(Font_path +"/"+ Font_file).c_str(), 0, &face))
     {
         std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
     }
 
     int divide = 10;
     font_texture_size = (height + width) / divide;
-    if (render_size != -1) font_texture_size = render_size;
+    if (Render_size != -1) font_texture_size = Render_size;
     FT_Set_Pixel_Sizes(face, 0, font_texture_size);
 
     if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
@@ -1057,12 +1074,12 @@ void Text::draw()
         else
         {
             setUniform1b("has_texture", true);
-            setTexture(Texture, "c_texture", true , 1);
+            setTexture(Texture, "c_texture", false , 1);
         }
         prev_Texture = Texture;
     };
     if (textureColorsChanged()) updateTextureColors();
-
+    setUniform1f("repeat", Texture_repeat);
 
     int x = X;
     // activate corresponding render state	
@@ -1070,12 +1087,12 @@ void Text::draw()
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
             // make 140px = 1px                 // adding font size
-    Scale = (1.0f / (float)font_texture_size) + ((float)font_size / (float)font_texture_size);
+    Scale = (1.0f / (float)font_texture_size) + ((float)Font_size / (float)font_texture_size);
     std::string::const_iterator c;
     
     int total_width = 0;
     int total_height = 0;
-    for (c = value.begin(); c != value.end(); c++) {
+    for (c = Value.begin(); c != Value.end(); c++) {
 
         Character ch = Characters[*c];
         if ((ch.Size.y * Scale) > total_height)total_height = ch.Size.y * Scale;
@@ -1085,7 +1102,7 @@ void Text::draw()
     float mid_h = total_height / 2;
 
 
-    for (c = value.begin(); c != value.end(); c++)
+    for (c = Value.begin(); c != Value.end(); c++)
     {
         Character ch = Characters[*c];
 
@@ -1095,7 +1112,6 @@ void Text::draw()
         float w = ch.Size.x * Scale;
         float h = ch.Size.y * Scale;
         // update VBO for each character
-
 
         float vertices[6][4] = {
             { xpos,     ypos + h,   0.0f, 0.0f }, // haut gauche
@@ -1113,8 +1129,8 @@ void Text::draw()
         {
             vertices[0][0] = xpos - mid_w;
             vertices[0][1] = (ypos + h) - mid_h;
-            vertices[0][2] = 0.0f;
-            vertices[0][3] = 0.0f;
+            vertices[0][2] = 0.0f; // texture position
+            vertices[0][3] = 0.0f; // texture position
         
             vertices[1][0] = xpos - mid_w;
             vertices[1][1] = ypos - mid_h;
@@ -1156,14 +1172,14 @@ void Text::draw()
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * Scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        x += (ch.Advance >> 6) * Scale; // bitshift by 6 to get Value in pixels (2^6 = 64)
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Text::scale(int scaler) {
-    font_size *= scaler;
+    Font_size *= scaler;
 }
 
 

@@ -65,7 +65,7 @@ void Program::onStartup()
 
     hell = new Polytriangle();
     hell->Size *= 2;
-    hell->setPositions(350);
+    PositionMiddle<Polytriangle>(hell);
     hell->shape_Coordinates[0].bottom_left.X = 20;
     hell->shape_Coordinates.push_back(
         { {0, 50} ,{0, 0} , { 10 ,0 } }
@@ -86,13 +86,14 @@ void Program::onStartup()
     //python_is_not_an_IDE = new Shape();
     //python_is_not_an_IDE->Transform_from_middle = false;
 
-    fps_counter = new Text(20);
-    fps_counter->font_size = 15;
-    fps_counter->setPositions(0,height - fps_counter->font_size);
+    fps_counter = new Text(60);
+    fps_counter->Font_size = 20;
+    fps_counter->setPositions(0,height - fps_counter->Font_size);
     fps_counter->setColors(220, 220, 220);
-    fps_counter->value = "fps: ...";
+    fps_counter->Value = "fps: ...";
     fps_counter->Transform_from_middle = false;
-    fps_counter->Texture = "anim1.png";
+    fps_counter->Texture = "motif.jpg";
+    fps_counter->Texture_repeat = 1;
 
     text = new Text();
     text->Transform_from_middle = false;
@@ -108,7 +109,7 @@ void Program::onUpdate()
     if (a_square->X_size > width) a_square->X_size = 0;
     deja_vu->nextFrameReverseOrderS(0.3); 
     runEachS(1, [] {
-        fps_counter->value = std::string("fps: " + std::to_string(fps));
+        fps_counter->Value = std::string("fps: " + std::to_string(fps));
     });
 }
 

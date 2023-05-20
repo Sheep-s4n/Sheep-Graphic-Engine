@@ -165,11 +165,12 @@ public:
 	Text();
 	Text(int render_size);
 	~Text();
-	int font_size;
-	const int render_size;
-	std::string value;
-	std::string font_file;
-	std::string font_path;
+	int Font_size;
+	const int Render_size;
+	std::string Value;
+	std::string Font_file;
+	std::string Font_path;
+	int Texture_repeat;
 };
 
 void runEachS(int time_inteval, const std::function<void()>& func);
@@ -185,7 +186,8 @@ Shape* copyShape(Shape* ptr);
 Polytriangle* copyShape(Polytriangle* ptr);
 Text* copyShape(Text* ptr);
 
-
+template<class T1>
+void PositionMiddle(T1* shape);
 
 //std::void_t = templated metafunction or type trait = evaluated at compile time
 // function = called with "()"
@@ -309,6 +311,8 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 		}
 	}
 };
+
+
 
 
 // todo :
