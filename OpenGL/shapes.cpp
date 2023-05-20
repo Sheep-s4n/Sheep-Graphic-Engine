@@ -81,6 +81,8 @@ template void PositionMiddle(Square*);
 template void PositionMiddle(Triangle*);
 template void PositionMiddle(Parallelogram*);
 template void PositionMiddle(Shape*);
+template void PositionMiddle(Text*);
+
 
 Circle* copyShape(Circle* ptr)
 {

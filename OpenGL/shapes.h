@@ -316,4 +316,5 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// position with template function |ex: PositionTopLeft<Object>(var)|
+// text rotation
+// text = reduce functions calls
