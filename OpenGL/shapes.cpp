@@ -12,7 +12,7 @@
 
 
 
-void runEachS(int s_time, const std::function<void()>& func)
+void runEachS(double s_time, const std::function<void()>& func)
 {
     static double prev_time = glfwGetTime();
     if (glfwGetTime() > prev_time + s_time)
@@ -58,6 +58,7 @@ T* copyBasicPropreties(T* shape, int arg = -1){
     new_shape->A = shape->A;
     new_shape->X = shape->X;
     new_shape->Y = shape->Y;
+    new_shape->Z_index = shape->Z_index;
     new_shape->X_rotate = shape->X_rotate;
     new_shape->Y_rotate = shape->Y_rotate;
     new_shape->Z_rotate = shape->Z_rotate;
@@ -72,6 +73,7 @@ void PositionMiddle(T1* shape)
 {
     shape->Transform_from_middle = true;
     shape->setPositions(width / 2, height / 2);
+
 }
 
 template void PositionMiddle(Polytriangle*);
@@ -151,13 +153,14 @@ Text* copyShape(Text* ptr)
     new_text->X_rotate = ptr->X_rotate;
     new_text->Y_rotate = ptr->Y_rotate;
     new_text->Z_rotate = ptr->Z_rotate;
+    new_text->Z_index = ptr->Z_index;
     new_text->Texture = ptr->Texture;
     new_text->Texture_colors = ptr->Texture_colors;
     // custom propreties:
     new_text->Transform_from_middle = ptr->Transform_from_middle;
     new_text->Font_size = ptr->Font_size;
     new_text->Font_path = ptr->Font_path;
-    new_text->Font_file = ptr->Font_size;
+    new_text->Font_file = ptr->Font_file;
     new_text->Value = ptr->Value;
     return new_text;
 }
@@ -215,13 +218,17 @@ void Square::updateVertexBuffer()
         Y_2 = Y;
     }
 
+    float T1 = Transform_from_middle ? 1.0f : 0.0f;
+    float T2 = Transform_from_middle ? 0.0f : 1.0f;
+
     float sqr_ver_buf[] =
     {
-      X_2, Y_2, 1.0f, 1.0f,
-      X_2, Y_1, 1.0f, 0.0f,
-      X_1, Y_1 ,0.0f, 0.0f,
-      X_1, Y_2, 0.0f, 1.0f,
+      X_2, Y_2, T1, T1,
+      X_2, Y_1, T1, T2,
+      X_1, Y_1 ,T2, T2,
+      X_1, Y_2, T2, T1
     };
+
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
     prev_X = X;
@@ -229,7 +236,7 @@ void Square::updateVertexBuffer()
     prev_Size = Size;
 }
 
-void Square::scale(int scaler) {
+void Square::scale(double scaler) {
     Size *= scaler;
 }
 
@@ -306,12 +313,15 @@ void Rectangle::updateVertexBuffer()
         Y_2 = Y;
     }
 
+    float T1 = Transform_from_middle ? 1.0f : 0.0f;
+    float T2 = Transform_from_middle ? 0.0f : 1.0f;
+
     float sqr_ver_buf[] =
     {
-      X_2, Y_2, 1.0f, 1.0f,
-      X_2, Y_1, 1.0f, 0.0f,
-      X_1, Y_1 ,0.0f, 0.0f,
-      X_1, Y_2, 0.0f, 1.0f
+      X_2, Y_2, T1, T1,
+      X_2, Y_1, T1, T2,
+      X_1, Y_1 ,T2, T2,
+      X_1, Y_2, T2, T1
     };
 
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
@@ -322,7 +332,7 @@ void Rectangle::updateVertexBuffer()
 }
 
 
-void Rectangle::scale(int scaler) {
+void Rectangle::scale(double scaler) {
     X_size *= scaler;
     Y_size *= scaler;
 }
@@ -411,12 +421,15 @@ void Circle::updateVertexBuffer()
         Y_2 = Y;
     }
 
+    float T1 = Transform_from_middle ? 1.0f : 0.0f;
+    float T2 = Transform_from_middle ? 0.0f : 1.0f;
+
     float sqr_ver_buf[] =
     {
-      X_2, Y_2,1.0f, 1.0f,
-      X_2, Y_1,1.0f, 0.0f,
-      X_1, Y_1,0.0f, 0.0f,
-      X_1, Y_2,0.0f, 1.0f
+      X_2, Y_2, T1, T1,
+      X_2, Y_1, T1, T2,
+      X_1, Y_1 ,T2, T2,
+      X_1, Y_2, T2, T1
     };
 
     scaleUp();
@@ -428,7 +441,7 @@ void Circle::updateVertexBuffer()
     prev_Y_size = Y_size;
 }
 
-void Circle::scale(int scaler) {
+void Circle::scale(double scaler) {
     X_size *= scaler;
     Y_size *= scaler;
 }
@@ -564,7 +577,7 @@ void Triangle::updateVertexBuffer()
     prev_triangle_coordinates = triangle_coordinates;
 }
 
-void Triangle::scale(int scaler) {
+void Triangle::scale(double scaler) {
     Size *= scaler;
 }
 
@@ -672,7 +685,7 @@ void Parallelogram::updateVertexBuffer()
     prev_triangle_coordinates = parallelogram_Coordinates;
 }
 
-void Parallelogram::scale(int scaler) {
+void Parallelogram::scale(double scaler) {
     Size *= scaler;
 }
 
@@ -781,7 +794,7 @@ void Shape::updateVertexBuffer()
     delete[] sqr_ind_buf;
 }
 
-void Shape::scale(int scaler) {
+void Shape::scale(double scaler) {
     Size *= scaler;
 }
 
@@ -912,7 +925,7 @@ void Polytriangle::updateVertexBuffer()
     delete[] sqr_ver_buf;
 }
 
-void Polytriangle::scale(int scaler) {
+void Polytriangle::scale(double scaler) {
     Size *= scaler;
 }
 
@@ -951,24 +964,13 @@ void Polytriangle::draw()
 
 
 
-Text::Text(int _Render_size) : Texture_repeat(2), Render_size(_Render_size), Scale(1), Font_file("arial.ttf"), Font_path("C:/Windows/Fonts"), Value("Hello, World!"), Font_size(48)
+
+void Text::loadChar() 
 {
-    program_id = fs.getProgram();
-    Program::sub_objects.push_back(this);
 
-    Texture_colors = { 255 , 255 ,255 ,255 };
-
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-    
-    ft = FT_Library();
-    if (FT_Init_FreeType(&ft))
-    {
-        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-    }
 
     face = FT_Face();
-    if (FT_New_Face(ft, std::string(Font_path +"/"+ Font_file).c_str(), 0, &face))
+    if (FT_New_Face(ft, std::string(Font_path + "/" + Font_file).c_str(), 0, &face))
     {
         std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
     }
@@ -977,15 +979,12 @@ Text::Text(int _Render_size) : Texture_repeat(2), Render_size(_Render_size), Sca
     font_texture_size = (height + width) / divide;
     if (Render_size != -1) font_texture_size = Render_size;
     FT_Set_Pixel_Sizes(face, 0, font_texture_size);
-
     if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
     {
         std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
     }
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-
-
+    Characters.clear();
     for (unsigned char c = 0; c < MAX_ASCII; c++)
     {
         // load character glyph 
@@ -1023,7 +1022,29 @@ Text::Text(int _Render_size) : Texture_repeat(2), Render_size(_Render_size), Sca
         };
         Characters.insert(std::pair<char, Character>(c, character));
     }
+}
 
+Text::Text(int _Render_size) : Texture_repeat(2), Render_size(_Render_size), Scale(1), Font_file("arial.ttf"), Font_path("C:/Windows/Fonts"), Value("Hello, World!"), Font_size(48)
+{
+    program_id = fs.getProgram();
+    Program::sub_objects.push_back(this);
+    prev_Font_file = Font_file;
+    prev_Font_path = Font_path;
+    prev_Render_size = Render_size;
+
+
+    Texture_colors = { 255 , 255 ,255 ,255 };
+
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
+    
+    ft = FT_Library();
+    if (FT_Init_FreeType(&ft))
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+    }
+
+    loadChar();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1046,6 +1067,20 @@ Text::Text() : Text(-1) {} //calling the other constructor !
 
 void Text::draw() 
 {
+    if 
+    (
+    prev_Font_file != Font_file ||
+    prev_Font_path != Font_path ||
+    prev_Render_size != Render_size
+    ) 
+    {
+        loadChar();
+        prev_Font_file = Font_file;
+        prev_Font_path = Font_path;
+        prev_Render_size = Render_size;
+    }
+
+
     fs.bindProgram(); //s.Use(); 
 
     //if (rotationChanged()) 
@@ -1180,7 +1215,7 @@ void Text::draw()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Text::scale(int scaler) {
+void Text::scale(double scaler) {
     Font_size *= scaler;
 }
 

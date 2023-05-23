@@ -53,7 +53,7 @@ private :
 	int prev_Size;
 public:
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	Square();
 	int Size;
 };
@@ -68,7 +68,7 @@ public:
 	void draw();
 	void setSizes(int X, int Y);
 	void setSizes(int XY);
-	void scale(int scaler);
+	void scale(double scaler);
 	Circle();
 	int X_size;
 	int Y_size;
@@ -83,7 +83,7 @@ public:
 	void draw();
 	void setSizes(int X, int Y);
 	void setSizes(int XY);
-	void scale(int scaler);
+	void scale(double scaler);
 	Rectangle();
 	int X_size;
 	int Y_size;
@@ -97,7 +97,7 @@ private:
 	Triangle_Coordinates prev_triangle_coordinates;
 public:
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	Triangle();
 	int Size;
 	Triangle_Coordinates triangle_coordinates;
@@ -112,7 +112,7 @@ private:
 public:
 	Parallelogram();
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	int Size;
 	Parallelogram_Coordinates parallelogram_Coordinates;
 };
@@ -127,7 +127,7 @@ private:
 public:
 	Shape();
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	int Size;
 	std::vector<Coordinates> shape_Coordinates = { {0, 0} ,{0, 70} , { 50 ,100 } , {100 ,70} , {100 ,0} };
 };
@@ -141,7 +141,7 @@ private:
 public:
 	Polytriangle();
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	int Size;
 	std::vector<Triangle_Coordinates> shape_Coordinates = { 
 		{{0, 100} ,{0, 0} , { 100 ,0 }} , {{0 ,100} , {100 ,100} , {100 ,0}}
@@ -159,21 +159,25 @@ private:
 	unsigned int VBO;
 	int font_texture_size;
 	float Scale;
+	int prev_Render_size;
+	std::string prev_Font_file;
+	std::string prev_Font_path;
+	void loadChar();
 public:
 	void draw();
-	void scale(int scaler);
+	void scale(double scaler);
 	Text();
 	Text(int render_size);
 	~Text();
 	int Font_size;
-	const int Render_size;
+	int Render_size;
 	std::string Value;
 	std::string Font_file;
 	std::string Font_path;
 	int Texture_repeat;
 };
 
-void runEachS(int time_inteval, const std::function<void()>& func);
+void runEachS(double time_inteval, const std::function<void()>& func);
 void runEachF(int frame_interval, const std::function<void()>& func);
 
 
@@ -318,3 +322,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 // todo :
 // text rotation
 // text = reduce functions calls
+// call updateBuffer for square , rectangle , circle when Transform_midlle changed

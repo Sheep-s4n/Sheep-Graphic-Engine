@@ -51,8 +51,8 @@ void Program::onStartup()
 
 
     tri_1 = new Triangle();
-    tri_1->setPositions(300 , 600);
-    tri_1->setColors(236 , 179 , 1 ,255);
+    tri_1->setPositions(300, 600);
+    tri_1->setColors(236, 179, 1, 255);
     tri_1->triangle_coordinates.top.Y = 70;
     tri_1->Transform_from_middle = false;
 
@@ -79,16 +79,16 @@ void Program::onStartup()
     help->A = 0;
     help->X_size = 700;
     help->Y_size = 300;
-    
+
     deja_vu = new Animator<Rectangle>(help);
-    deja_vu->addFrames(6, "anim1.png", "anim2.png", "anim3.png", "anim4.png" , "anim5.png" , "anim6.png");
+    deja_vu->addFrames(6, "anim1.png", "anim2.png", "anim3.png", "anim4.png", "anim5.png", "anim6.png");
 
     //python_is_not_an_IDE = new Shape();
     //python_is_not_an_IDE->Transform_from_middle = false;
 
     fps_counter = new Text(60);
     fps_counter->Font_size = 20;
-    fps_counter->setPositions(0,height - fps_counter->Font_size);
+    fps_counter->setPositions(0, height - fps_counter->Font_size);
     fps_counter->setColors(220, 220, 220);
     fps_counter->Value = "fps: ...";
     fps_counter->Transform_from_middle = false;
@@ -98,7 +98,7 @@ void Program::onStartup()
     text = new Text();
     text->Transform_from_middle = false;
     text->setPositions(250);
-    
+
 }
 
 void Program::onUpdate()
@@ -107,10 +107,10 @@ void Program::onUpdate()
     help->Texture_colors.G -= 1;
     a_square->X_size += 3;
     if (a_square->X_size > width) a_square->X_size = 0;
-    deja_vu->nextFrameReverseOrderS(0.3); 
+    deja_vu->nextFrameReverseOrderS(0.3);
     runEachS(1, [] {
         fps_counter->Value = std::string("fps: " + std::to_string(fps));
-    });
+        });
 }
 
 void Program::onFinish()

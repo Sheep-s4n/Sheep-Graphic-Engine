@@ -120,5 +120,5 @@ constexpr bool scale_render_on_window_resize = true; // resize the rendering whe
 * update_width (width after window resizing)
 * update_height (height after window resizing)
 
-## Current version : 1.0
+> ### Current version : 1.1
 
