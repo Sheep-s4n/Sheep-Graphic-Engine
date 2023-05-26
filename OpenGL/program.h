@@ -58,7 +58,7 @@ public:
 		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
 		current_texture_sloat++;
 	};
-	void nextFrameS(float switch_interval)
+	void nextFrameS(double switch_interval)
 	{
 		if (shape->Texture != "") return; // not changing if the shape has already a texture
 		if (glfwGetTime() <= time + switch_interval) return;
@@ -107,7 +107,7 @@ public:
 		shape->setTexture(myMap[current_texture_sloat].image_path, "c_texture", true, myMap[current_texture_sloat].sloat);
 		current_texture_sloat--;
 	};
-	void nextFrameReverseOrderS(float switch_interval)
+	void nextFrameReverseOrderS(double switch_interval)
 	{
 		if (shape->Texture != "") return; // not changing if the shape has already a texture
 		if (glfwGetTime() <= time + switch_interval) return;

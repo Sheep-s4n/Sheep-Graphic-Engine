@@ -197,6 +197,7 @@ Square::Square() :Size(100) {
     prev_Y = Y;
     prev_Size = Size;
     prev_Texture = Texture;
+    prev_Transform_from_middle = Transform_from_middle;
     Texture_colors = { 255 , 255 ,255 ,255 };
 }
 
@@ -233,7 +234,8 @@ void Square::updateVertexBuffer()
     setDynamicVertexBuffer(sqr_ver_buf, sizeof(sqr_ver_buf));
     prev_X = X;
     prev_Y = Y;
-    prev_Size = Size;
+    prev_Size = Size;           
+    prev_Transform_from_middle = Transform_from_middle;
 }
 
 void Square::scale(double scaler) {
@@ -244,6 +246,7 @@ void Square::scale(double scaler) {
 void Square::draw() 
 {
     if (
+        prev_Transform_from_middle != Transform_from_middle ||
         prev_X != X ||
         prev_Y != Y ||
         prev_Size != Size
@@ -292,6 +295,7 @@ Rectangle::Rectangle() : X_size(100) , Y_size(50) {
     prev_X_size = X_size;
     prev_Y_size = Y_size;
     prev_Texture = Texture;
+    prev_Transform_from_middle = Transform_from_middle;
     Texture_colors = { 255 , 255 ,255 ,255 };
 }
 
@@ -329,6 +333,7 @@ void Rectangle::updateVertexBuffer()
     prev_Y = Y;
     prev_X_size = X_size;
     prev_Y_size = Y_size;
+    prev_Transform_from_middle = Transform_from_middle;
 }
 
 
@@ -341,6 +346,7 @@ void Rectangle::draw()
 {
 
     if (
+        prev_Transform_from_middle != Transform_from_middle ||
         prev_X != X ||
         prev_Y != Y ||
         prev_X_size != X_size ||   
@@ -400,6 +406,7 @@ Circle::Circle() : X_size(100) , Y_size(100) {
     prev_X_size = X_size;
     prev_Y_size = Y_size;
     prev_Texture = Texture;
+    prev_Transform_from_middle = Transform_from_middle;
     Texture_colors = { 255 , 255 ,255 ,255 };
 }
 
@@ -439,6 +446,7 @@ void Circle::updateVertexBuffer()
     prev_Y = Y;
     prev_X_size = X_size;
     prev_Y_size = Y_size;
+    prev_Transform_from_middle = Transform_from_middle;
 }
 
 void Circle::scale(double scaler) {
@@ -464,6 +472,7 @@ void Circle::draw()
 {
     if (scale_render_on_window_resize && windowSizeChanged(update_width , update_height)) scaleUp();
     if (
+        prev_Transform_from_middle != Transform_from_middle ||
         prev_X != X ||
         prev_Y != Y ||
         prev_X_size != X_size ||
@@ -1083,25 +1092,25 @@ void Text::draw()
 
     fs.bindProgram(); //s.Use(); 
 
-    //if (rotationChanged()) 
-    //{
-    //    glm::mat4 mvp =
-    //        glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
-    //        * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
-    //        * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
-    //        * proj;
-    //
-    //    glProgramUniformMatrix4fv(
-    //        fs.getProgram(),
-    //        glGetUniformLocation(fs.getProgram(), "projection"),
-    //        1, GL_FALSE,
-    //        &mvp[0][0]
-    //    );
-    //
-    //    prev_rotation[0] = X_rotate;
-    //    prev_rotation[1] = Y_rotate;
-    //    prev_rotation[2] = Z_rotate;
-    //};
+    if (rotationChanged()) 
+    {
+        glm::mat4 mvp =
+            glm::rotate(glm::mat4(1.0f), glm::radians((float)Z_rotate), glm::vec3(0.0f, 0.0f, 1.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians((float)Y_rotate), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians((float)X_rotate), glm::vec3(1.0f, 0.0f, 0.0f))
+            * proj;
+    
+        glProgramUniformMatrix4fv(
+            fs.getProgram(),
+            glGetUniformLocation(fs.getProgram(), "projection"),
+            1, GL_FALSE,
+            &mvp[0][0]
+        );
+    
+        prev_rotation[0] = X_rotate;
+        prev_rotation[1] = Y_rotate;
+        prev_rotation[2] = Z_rotate;
+    };
     if (prev_Texture != Texture) 
     {
         if (Texture == "")
@@ -1138,6 +1147,14 @@ void Text::draw()
     float mid_w = total_width / 2;
     float mid_h = total_height / 2;
 
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    if (Texture != "")
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture.texture_id);
+    }
+    glActiveTexture(GL_TEXTURE0);
 
     for (c = Value.begin(); c != Value.end(); c++)
     {
@@ -1195,22 +1212,15 @@ void Text::draw()
             vertices[5][3] = 0.0f;
         }
         // render glyph texture over quad
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ch.textureID);
-        if (Texture != "")
-        {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, texture.texture_id);
-        }
         // update content of VBO memory
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         x += (ch.Advance >> 6) * Scale; // bitshift by 6 to get Value in pixels (2^6 = 64)
     }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }

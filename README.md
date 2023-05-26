@@ -99,7 +99,7 @@ constexpr bool scale_render_on_window_resize = true; // resize the rendering whe
 * void copyShapeStyles(T1* shape, T2* target_shape); (copy the style of the first shape in the second one)
 * void copyShapeTransformations(T1* shape, T2* target_shape); (copy the transformations of the first shape in the second one)
 ### Extra class: 
-* Animator (change the texture of any shape)
+* Animator<\Shape> (change the texture of any shape)
     * void linkShape(Object* shape); (selects the shape on which the animator will be used)
     * void nextFrameF(int switch_interval); (changes texture each *switch_interval* rendered frames)
     * void nextFrameS(float switch_interval); (changes texture each *switch_interval* seconds)
@@ -120,5 +120,5 @@ constexpr bool scale_render_on_window_resize = true; // resize the rendering whe
 * update_width (width after window resizing)
 * update_height (height after window resizing)
 
-> ### Current version : 1.1
+> ### Current version : 1.2
 

@@ -18,7 +18,6 @@ Text* fps_counter;
 Text* fps_counter_copy;
 Text* text;
 
-
 void Program::onStartup()
 {
 
@@ -83,8 +82,6 @@ void Program::onStartup()
     deja_vu = new Animator<Rectangle>(help);
     deja_vu->addFrames(6, "anim1.png", "anim2.png", "anim3.png", "anim4.png", "anim5.png", "anim6.png");
 
-    //python_is_not_an_IDE = new Shape();
-    //python_is_not_an_IDE->Transform_from_middle = false;
 
     fps_counter = new Text(60);
     fps_counter->Font_size = 20;
@@ -98,7 +95,6 @@ void Program::onStartup()
     text = new Text();
     text->Transform_from_middle = false;
     text->setPositions(250);
-
 }
 
 void Program::onUpdate()

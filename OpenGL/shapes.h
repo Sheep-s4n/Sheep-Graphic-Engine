@@ -51,6 +51,7 @@ class Square : public Object {
 private :
 	void updateVertexBuffer();
 	int prev_Size;
+	bool prev_Transform_from_middle;
 public:
 	void draw();
 	void scale(double scaler);
@@ -64,6 +65,7 @@ private:
 	void scaleUp();
 	int prev_X_size;
 	int prev_Y_size;
+	bool prev_Transform_from_middle;
 public:
 	void draw();
 	void setSizes(int X, int Y);
@@ -79,6 +81,7 @@ private:
 	void updateVertexBuffer();
 	int prev_X_size;
 	int prev_Y_size;
+	bool prev_Transform_from_middle;
 public:
 	void draw();
 	void setSizes(int X, int Y);
@@ -320,6 +323,4 @@ void copyShapeTransformations(T1* shape, T2* target_shape) {
 
 
 // todo :
-// text rotation
-// text = reduce functions calls
-// call updateBuffer for square , rectangle , circle when Transform_midlle changed
+
